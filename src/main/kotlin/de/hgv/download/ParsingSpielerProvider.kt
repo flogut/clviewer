@@ -13,9 +13,7 @@ class ParsingSpielerProvider {
 
         val name = doc.selectFirst(".sidebar > .box > .head > h2[itemprop=name]")?.text()
 
-        val tabelle =
-            doc.selectFirst("table.standard_tabelle.yellow")
-                    ?: return null
+        val tabelle = doc.selectFirst("table.standard_tabelle.yellow") ?: return null
         val rows = tabelle.select("tr")
 
         val dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
@@ -41,8 +39,7 @@ class ParsingSpielerProvider {
             ?.toIntOrNull()
 
         val vereinName =
-            doc.selectFirst("table.standard_tabelle > tbody > tr:contains(#) > td:eq(1) > a")?.text()
-                    ?: return null
+            doc.selectFirst("table.standard_tabelle > tbody > tr:contains(#) > td:eq(1) > a")?.text() ?: return null
 
         val vereinId =
             doc.selectFirst("table.standard_tabelle > tbody > tr:contains(#) > td:eq(1) > a")
