@@ -28,18 +28,9 @@ class SpielerView: View() {
     private val spielfuss = spielerProperty.selectString { it?.spielfuss?.let { "Starker Fuß: ${it.capitalize()}" } }
     private val spielerBildUrl = spielerProperty.selectString { it?.portraitUrl }
     private val wappenUrl = spielerProperty.selectString { it?.verein?.wappenURL }
-    private val flaggeUrl =
-        spielerProperty.selectString { "http://www.nationalflaggen.de/media/flags/flagge-${it?.land?.toLowerCase()}.gif" }
-    private val geburtstag = spielerProperty.selectString {
-        it?.geburtstag?.let {
-            "Geburtstag: ${it.format(DateTimeFormatter.ofPattern("dd. MMMM uuuu"))}"
-        }
-    }
-    private val position = spielerProperty.selectString {
-        it?.let {
-            "Position" + (if (it.positionen.size > 1) "en" else "") + ": " + it.positionen.joinToString(", ")
-        }
-    }
+    private val flaggeUrl = getFlaggeUrl()
+    private val geburtstag = getGeburtstag()
+    private val position = getPosition()
 
     override val root = pane {
         useMaxSize = true
@@ -128,19 +119,33 @@ class SpielerView: View() {
     }
 
     init {
-        runLater {
-            root.requestFocus()
-        }
+        primaryStage.isResizable = false
+        titleProperty.bind(name)
 
         spielerProperty.onChange {
             primaryStage.sizeToScene()
         }
 
-        primaryStage.isResizable = false
-
-        titleProperty.bind(name)
-
         spieler = provider.getSpieler("joshua-kimmich")
+
+        runLater {
+            root.requestFocus()
+        }
+    }
+
+    private fun getFlaggeUrl(): Property<String> =
+        spielerProperty.selectString { "http://www.nationalflaggen.de/media/flags/flagge-${it?.land?.toLowerCase()}.gif" }
+
+    private fun getGeburtstag(): Property<String> = spielerProperty.selectString { spieler ->
+        spieler?.geburtstag?.let { geburtstag ->
+            "Geburtstag: " + geburtstag.format(DateTimeFormatter.ofPattern("dd. MMMM yyyy"))
+        }
+    }
+
+    private fun getPosition() = spielerProperty.selectString { spieler ->
+        spieler?.positionen?.let { positionen ->
+            "Position" + (if (positionen.size > 1) "en" else "") + ": " + positionen.joinToString(", ")
+        }
     }
 
     private fun <T> ObservableValue<T>.selectString(nested: (T) -> String?): Property<String> =
