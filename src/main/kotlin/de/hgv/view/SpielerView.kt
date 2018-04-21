@@ -22,12 +22,12 @@ class SpielerView: View() {
     private val spielerProperty = SimpleObjectProperty((params["id"] as? String)?.let { provider.getSpieler(it) })
     private var spieler by spielerProperty
 
-    private val name = spielerProperty.selectString { it?.name }
-    private val nummer = spielerProperty.selectString { it?.nummer?.let { "#${it}" } }
-    private val groesse = spielerProperty.selectString { it?.groesse?.let { "Größe: ${it}cm" } }
-    private val spielfuss = spielerProperty.selectString { it?.spielfuss?.let { "Starker Fuß: ${it.capitalize()}" } }
-    private val spielerBildUrl = spielerProperty.selectString { it?.portraitUrl }
-    private val wappenUrl = spielerProperty.selectString { it?.verein?.wappenURL }
+    private val name = spielerProperty.selectString { spieler -> spieler?.name }
+    private val nummer = spielerProperty.selectString { spieler -> spieler?.nummer?.let { nummer -> "#$nummer" } }
+    private val spielerBildUrl = spielerProperty.selectString { spieler -> spieler?.portraitUrl }
+    private val wappenUrl = spielerProperty.selectString { spieler -> spieler?.verein?.wappenURL }
+    private val groesse = getGroesse()
+    private val spielfuss = getSpielfuss()
     private val flaggeUrl = getFlaggeUrl()
     private val geburtstag = getGeburtstag()
     private val position = getPosition()
@@ -132,6 +132,12 @@ class SpielerView: View() {
             root.requestFocus()
         }
     }
+
+    private fun getGroesse(): Property<String> =
+        spielerProperty.selectString { spieler -> spieler?.groesse?.let { groesse -> "Größe: ${groesse}cm" } }
+
+    private fun getSpielfuss(): Property<String> =
+        spielerProperty.selectString { spieler -> spieler?.spielfuss?.let { spielfuss -> "Starker Fuß: ${spielfuss.capitalize()}" } }
 
     private fun getFlaggeUrl(): Property<String> =
         spielerProperty.selectString { "http://www.nationalflaggen.de/media/flags/flagge-${it?.land?.toLowerCase()}.gif" }
