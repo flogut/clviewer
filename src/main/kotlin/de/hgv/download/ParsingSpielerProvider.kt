@@ -11,7 +11,7 @@ class ParsingSpielerProvider {
     fun getSpieler(id: String): Spieler? {
         val doc = Jsoup.parse(URL("http://www.weltfussball.de/spieler_profil/$id"), 5000)
 
-        val name = doc.selectFirst(".sidebar > .box > .head > h2[itemprop=name]")?.text()
+        val name = doc.selectFirst(".sidebar > .box > .head > h2[itemprop=name]")?.text() ?: id
 
         val tabelle = doc.selectFirst("table.standard_tabelle.yellow") ?: return null
         val rows = tabelle.select("tr")
@@ -51,7 +51,7 @@ class ParsingSpielerProvider {
         val portraitUrl = doc.selectFirst("div.data[itemprop=image] > img")?.attr("src")
 
         return Spieler(
-            name = name ?: id,
+            name = name,
             id = id,
             verein = verein,
             positionen = positionen,
