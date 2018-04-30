@@ -23,9 +23,10 @@ class SpielerView: View() {
     private var spieler by spielerProperty
 
     private val name = spielerProperty.selectString { spieler -> spieler?.name }
-    private val nummer = spielerProperty.selectString { spieler -> spieler?.nummer?.let { nummer -> "#$nummer" } }
-    private val spielerBildUrl = spielerProperty.selectString { spieler -> spieler?.portraitUrl }
-    private val wappenUrl = spielerProperty.selectString { spieler -> spieler?.verein?.wappenURL }
+    private val nummer =
+        spielerProperty.selectString { spieler -> spieler?.details?.nummer?.let { nummer -> "#$nummer" } }
+    private val spielerBildUrl = spielerProperty.selectString { spieler -> spieler?.details?.portraitUrl }
+    private val wappenUrl = spielerProperty.selectString { spieler -> spieler?.details?.verein?.wappenURL }
     private val groesse = getGroesse()
     private val spielfuss = getSpielfuss()
     private val flaggeUrl = getFlaggeUrl()
@@ -134,22 +135,22 @@ class SpielerView: View() {
     }
 
     private fun getGroesse(): Property<String> =
-        spielerProperty.selectString { spieler -> spieler?.groesse?.let { groesse -> "Größe: ${groesse}cm" } }
+        spielerProperty.selectString { spieler -> spieler?.details?.groesse?.let { groesse -> "Größe: ${groesse}cm" } }
 
     private fun getSpielfuss(): Property<String> =
-        spielerProperty.selectString { spieler -> spieler?.spielfuss?.let { spielfuss -> "Starker Fuß: ${spielfuss.capitalize()}" } }
+        spielerProperty.selectString { spieler -> spieler?.details?.spielfuss?.let { spielfuss -> "Starker Fuß: ${spielfuss.capitalize()}" } }
 
     private fun getFlaggeUrl(): Property<String> =
-        spielerProperty.selectString { "http://www.nationalflaggen.de/media/flags/flagge-${it?.land?.toLowerCase()}.gif" }
+        spielerProperty.selectString { "http://www.nationalflaggen.de/media/flags/flagge-${it?.details?.land?.toLowerCase()}.gif" }
 
     private fun getGeburtstag(): Property<String> = spielerProperty.selectString { spieler ->
-        spieler?.geburtstag?.let { geburtstag ->
+        spieler?.details?.geburtstag?.let { geburtstag ->
             "Geburtstag: " + geburtstag.format(DateTimeFormatter.ofPattern("dd. MMMM yyyy"))
         }
     }
 
     private fun getPosition() = spielerProperty.selectString { spieler ->
-        spieler?.positionen?.let { positionen ->
+        spieler?.details?.positionen?.let { positionen ->
             "Position" + (if (positionen.size > 1) "en" else "") + ": " + positionen.joinToString(", ")
         }
     }

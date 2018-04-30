@@ -9,14 +9,27 @@ import java.time.format.DateTimeFormatter
 
 class ParsingSpielProvider {
 
-    fun getSpiel(saison: Int, phase: String, daheim: Verein, auswaerts: Verein): Spiel? {
+    /**
+     * getSpiel parst die Daten zu einem Spiel
+     * @param saison Jahr, in dem das Finale stattfindet (z.B. Saison 2017/2018 => 2018)
+     * @param phase Phase, in der das Spiel stattfindet (Gruppe A, ..., Gruppe F, Achtelfinale, Viertelfinale, Halbfinale, Finale)
+     * @param daheim Heimmannschaft
+     * @param auswaerts Auswärtsmannschaft
+     * @param detailed Falls true werden die Details des Spiels geparst (Aufstellungen, Torschützen)
+     */
+    fun getSpiel(saison: Int, phase: String, daheim: Verein, auswaerts: Verein, detailed: Boolean): Spiel? {
         val linkPhase = phase.replace(" ", "-").toLowerCase()
         val link =
             "http://www.weltfussball.de/spielbericht/champions-league-${saison - 1}-$saison-$linkPhase-${daheim.id}-${auswaerts.id}"
-        return getSpiel(link)
+        return getSpiel(link, detailed)
     }
 
-    fun getSpiel(link: String): Spiel? {
+    /**
+     * getSpiel parst die Daten zu einem Spiel
+     * @param link Letzter Teil des Links zur Spielübersicht
+     * @param detailed Falls true werden die Details des Spiels geparst (Aufstellungen, Torschützen)
+     */
+    fun getSpiel(link: String, detailed: Boolean): Spiel? {
         val doc = Jsoup.parse(URL(link), 5000)
 
         val tabelle = doc.selectFirst(".box > .data > .standard_tabelle") ?: return null
@@ -49,13 +62,41 @@ class ParsingSpielProvider {
         val toreHeim = ergebnis[0].toIntOrNull() ?: return null
         val toreAuswaerts = ergebnis[1].toIntOrNull() ?: return null
 
-        val spielerHeimTabelle = doc.selectFirst(".box .data table td:eq(0) > table.standard_tabelle")
+        // \u00BB = »
+        val phase =
+            doc.selectFirst("#navi > .breadcrumb > h1")
+                ?.text()
+                ?.substringAfter("\u00BB")
+                ?.substringBeforeLast("\u00BB")
+                ?.trim() ?: return null
+
+        val spiel = Spiel(daheim, auswaerts, datum, toreHeim, toreAuswaerts, phase)
+
+        if (detailed) {
+            spiel.details = getDetailsForSpiel(spiel)
+        }
+
+        return spiel
+    }
+
+    /**
+     * getDetailsForSpiel parst die Details zu einem Spiel (Aufstellungen, Torschützen)
+     * @param spiel Spiel, dessen Details geparst werden sollen
+     */
+    fun getDetailsForSpiel(spiel: Spiel): Spiel.Details? {
+        val linkPhase = spiel.phase.replace(" ", "-").toLowerCase()
+        val link =
+            "http://www.weltfussball.de/spielbericht/champions-league-${spiel.saison - 1}-${spiel.saison}-$linkPhase-${spiel.daheim.id}-${spiel.auswaerts.id}"
+        val doc = Jsoup.parse(URL(link), 5000)
+
+        val spielerHeimTabelle = doc.selectFirst(".box .data table td:eq(0) > table.standard_tabelle") ?: return null
         val spielerHeim = getAufstellung(spielerHeimTabelle)
 
-        val spielerAuswaertsTabelle = doc.selectFirst(".box .data table td:eq(1) > table.standard_tabelle")
+        val spielerAuswaertsTabelle =
+            doc.selectFirst(".box .data table td:eq(1) > table.standard_tabelle") ?: return null
         val spielerAuswaerts = getAufstellung(spielerAuswaertsTabelle)
 
-        val toreTabelle = doc.selectFirst("table.standard_tabelle:contains(Tore)")
+        val toreTabelle = doc.selectFirst("table.standard_tabelle:contains(Tore)") ?: return null
         val torschuetzen =
             toreTabelle
                 .select("tr:gt(0) > td:eq(1) > a:eq(0)").asSequence()
@@ -68,24 +109,24 @@ class ParsingSpielProvider {
         //TODO Karten speichern
         //TODO Anzeige als Timeline?
 
-        return Spiel(
-            daheim = daheim,
-            auswaerts = auswaerts,
-            datum = datum,
-            toreHeim = toreHeim,
-            toreAuswaerts = toreAuswaerts,
-            spielerHeim = spielerHeim,
-            spielerAuswaerts = spielerAuswaerts,
-            torschuetzen = torschuetzen
-        )
+        return Spiel.Details(spielerHeim, spielerAuswaerts, torschuetzen)
     }
 
+    /**
+     * getId holt die ID eines Vereins
+     * @param rows Zeilen der Tabelle mit den Vereinsnamen
+     * @param index Index der Spalte, in der der Name des Vereins, dessen ID gesucht wird, steht
+     */
     private fun getId(rows: Elements, index: Int): String? =
         rows.firstOrNull()
             ?.selectFirst("th:eq($index) > a")
             ?.attr("href")
             ?.removeSurrounding("/teams/", "/")
 
+    /**
+     * getAufstellung parst die Aufstellung (bestehend aus Startelf und eingewechselten Spielern)
+     * @param tabelle Tabelle, in der die Aufstellung des gesuchten Vereins steht
+     */
     private fun getAufstellung(tabelle: Element): List<Pair<String, String>> {
         val spieler = mutableListOf<Pair<String, String>>()
 

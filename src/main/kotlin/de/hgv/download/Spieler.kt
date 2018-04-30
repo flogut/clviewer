@@ -5,12 +5,25 @@ import java.time.LocalDate
 data class Spieler(
     val name: String,
     val id: String,
-    val verein: Verein,
-    val positionen: List<String>,
-    val nummer: Int?,
-    val land: String?,
-    val geburtstag: LocalDate?,
-    val groesse: Int?,
-    val spielfuss: String?,
-    val portraitUrl: String?
-)
+    var details: Details? = null
+) {
+
+    /**
+     * Lädt die Details dieses Spielers herunter und setzt sie als Wert von details
+     * @param provider Provider, der zum Download genutzt werden soll
+     */
+    fun loadDetails(provider: Provider) {
+        details = provider.getDetailsForSpieler(this)
+    }
+
+    data class Details(
+        val verein: Verein,
+        val positionen: List<String>,
+        val nummer: Int?,
+        val land: String?,
+        val geburtstag: LocalDate?,
+        val groesse: Int?,
+        val spielfuss: String?,
+        val portraitUrl: String?
+    )
+}

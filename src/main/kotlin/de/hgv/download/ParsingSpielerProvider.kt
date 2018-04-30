@@ -8,6 +8,10 @@ import java.time.format.DateTimeFormatter
 
 class ParsingSpielerProvider {
 
+    /**
+     * getSpieler parst alle Daten zu einem Spieler
+     * @param id ID des Spielers
+     */
     fun getSpieler(id: String): Spieler? {
         val doc = Jsoup.parse(URL("http://www.weltfussball.de/spieler_profil/$id"), 5000)
 
@@ -50,26 +54,37 @@ class ParsingSpielerProvider {
 
         val portraitUrl = doc.selectFirst("div.data[itemprop=image] > img")?.attr("src")
 
-        return Spieler(
-            name = name,
-            id = id,
-            verein = verein,
-            positionen = positionen,
-            nummer = nummer,
-            land = land,
-            geburtstag = geburtstag,
-            groesse = groesse,
-            spielfuss = spielfuss,
-            portraitUrl = portraitUrl
-        )
+        val details = Spieler.Details(verein, positionen, nummer, land, geburtstag, groesse, spielfuss, portraitUrl)
+
+        return Spieler(name, id, details)
     }
 
+    /**
+     * getDetailsForSpieler parst die Details zu einem Spieler
+     * @param spieler Spieler, dessen Details geparst werden sollen
+     */
+    fun getDetailsForSpieler(spieler: Spieler): Spieler.Details? {
+        return getSpieler(spieler.id)?.details
+    }
+
+    /**
+     * Sei eine aus zwei Spalten bestehende Tabelle mit den Zeilen rows gegeben.
+     * Gibt es nun eine Zeile, deren erste Spalte text enthält, dann gibt getTextFromTable den Text der rechten Spalte dieser Zeile zurück.
+     * @param rows Zeilen einer Tabelle
+     * @param text Text, nach dem gesucht wird
+     */
     private fun getTextFromTable(rows: Elements, text: String): String? = rows.select("tr:contains($text)")
         .firstOrNull()
         ?.select("td")
         ?.get(1)
         ?.text()
 
+    /**
+     * Sei eine aus zwei Spalten bestehende Tabelle mit den Zeilen rows gegeben.
+     * Gibt es nun eine Zeile, deren erste Spalte text enthält, dann gibt getHtmlFromTable den HTML-Code der rechten Spalte dieser Zeile zurück.
+     * @param rows Zeilen einer Tabelle
+     * @param text Text, nach dem gesucht wird
+     */
     private fun getHtmlFromTable(rows: Elements, text: String): String? = rows.select("tr:contains($text)")
         .firstOrNull()
         ?.select("td")
