@@ -9,11 +9,13 @@ data class Spieler(
 ) {
 
     /**
-     * Lädt die Details dieses Spielers herunter und setzt sie als Wert von details
+     * Lädt die Details dieses Spielers herunter und setzt sie als Wert von details, wenn details null ist
      * @param provider Provider, der zum Download genutzt werden soll
      */
     fun loadDetails(provider: Provider) {
-        details = provider.getDetailsForSpieler(this)
+        if (details != null) {
+            details = provider.getDetailsForSpieler(this)
+        }
     }
 
     data class Details(

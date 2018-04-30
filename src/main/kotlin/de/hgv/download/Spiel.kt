@@ -21,19 +21,21 @@ data class Spiel(
     }
 
     /**
-     * Lädt die Details dieses Spiels herunter und setzt sie als Wert von details
+     * Lädt die Details dieses Spiels herunter und setzt sie als Wert von details, wenn details null ist
      * @param provider Provider, der zum Download genutzt werden soll
      */
     fun loadDetails(provider: Provider) {
-        details = provider.getDetailsForSpiel(this)
+        if (details == null) {
+            details = provider.getDetailsForSpiel(this)
+        }
     }
 
     //TODO details zu einer lazy Property ändern? Problem: kein fester Provider => Provider als Singleton? (=> nur bei compilezeit festlegbar)
 
     data class Details(
         // Spieler werden als Paar von ID und Name gespeichert, um unnötige Netzwerkanfragen zu vermeiden
-        val spielerHeim: List<Pair<String, String>>,
-        val spielerAuswaerts: List<Pair<String, String>>,
-        val torschuetzen: List<Pair<String, String>>
+        val spielerHeim: List<Spieler>,
+        val spielerAuswaerts: List<Spieler>,
+        val torschuetzen: List<Spieler>
     )
 }

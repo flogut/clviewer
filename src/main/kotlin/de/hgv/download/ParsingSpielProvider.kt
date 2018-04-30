@@ -102,6 +102,7 @@ class ParsingSpielProvider {
                 .select("tr:gt(0) > td:eq(1) > a:eq(0)").asSequence()
                 .map { it.attr("href") to it.attr("title") }
                 .map { (link, name) -> link.removeSurrounding("/spieler_profil/", "/") to name }
+                .map { (id, name) -> Spieler(name, id) }
                 .toList()
 
         //TODO Zu Toren Zeitpunkt und Vorlagengeber speichern
@@ -127,13 +128,14 @@ class ParsingSpielProvider {
      * getAufstellung parst die Aufstellung (bestehend aus Startelf und eingewechselten Spielern)
      * @param tabelle Tabelle, in der die Aufstellung des gesuchten Vereins steht
      */
-    private fun getAufstellung(tabelle: Element): List<Pair<String, String>> {
-        val spieler = mutableListOf<Pair<String, String>>()
+    private fun getAufstellung(tabelle: Element): List<Spieler> {
+        val spieler = mutableListOf<Spieler>()
 
         val startelfLinks = tabelle.select("tr:lt(11) > td:eq(1) > a")
         startelfLinks.asSequence()
             .map { it.attr("href") to it.attr("title") }
             .map { (link, name) -> link.removeSurrounding("/spieler_profil/", "/") to name }
+            .map { (id, name) -> Spieler(name, id) }
             .toCollection(spieler)
 
         val reserve = tabelle.select("tr:gt(11)")
@@ -142,6 +144,7 @@ class ParsingSpielProvider {
             .map { it.selectFirst("td:eq(1) > a") }
             .map { it.attr("href") to it.attr("title") }
             .map { (link, name) -> link.removeSurrounding("/spieler_profil/", "/") to name }
+            .map { (id, name) -> Spieler(name, id) }
             .toCollection(spieler)
 
         return spieler
