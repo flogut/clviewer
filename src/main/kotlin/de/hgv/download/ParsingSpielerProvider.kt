@@ -55,8 +55,10 @@ class ParsingSpielerProvider {
         val portraitUrl = doc.selectFirst("div.data[itemprop=image] > img")?.attr("src")
 
         val details = Spieler.Details(verein, positionen, nummer, land, geburtstag, groesse, spielfuss, portraitUrl)
+        val spieler = Spieler(name, id)
+        spieler.details = details
 
-        return Spieler(name, id, details)
+        return spieler
     }
 
     /**

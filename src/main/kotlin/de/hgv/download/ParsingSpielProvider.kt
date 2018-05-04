@@ -97,22 +97,33 @@ class ParsingSpielProvider {
         val spielerAuswaerts = getAufstellung(spielerAuswaertsTabelle)
 
         val toreTabelle = doc.selectFirst("table.standard_tabelle:contains(Tore)") ?: return null
-        val torschuetzen =
-            toreTabelle
-                .select("tr:gt(0) > td:eq(1) > a:eq(0)").asSequence()
-                .map { it.attr("href") to it.attr("title") }
-                .map { (link, name) -> link.removeSurrounding("/spieler_profil/", "/") to name }
-                .map { (id, name) -> Spieler(name, id) }
-                .toList()
+        val tore = mutableListOf<Tor>()
+        for (tor in toreTabelle.select("tr:gt(0) > td:eq(1)")) {
+            val torschuetze = tor.selectFirst("a")
+                ?.let { Spieler(it.attr("title"), it.attr("href").removeSurrounding("/spieler_profil/", "/")) }
 
-        //TODO Zu Toren Zeitpunkt und Vorlagengeber speichern
-        //TODO Auswechslungen explizit mit Zeitpunkt speichern
+            val vorlagengeber = tor.selectFirst("a:gt(0)")
+                ?.let { Spieler(it.attr("title"), it.attr("href").removeSurrounding("/spieler_profil/", "/")) }
+
+            val spielminute = tor.ownText().substringBefore(". /").trim().toIntOrNull()
+
+            val eigentor = tor.ownText().contains("Eigentor")
+
+            if (torschuetze == null || spielminute == null) {
+                continue
+            }
+
+            tore.add(Tor(torschuetze, vorlagengeber, spielminute, eigentor))
+        }
+
+        val auswechslungenHeim = getAuswechslungen(spielerHeimTabelle)
+
+        val auswechslungenAuswaerts = getAuswechslungen(spielerAuswaertsTabelle)
+
         //TODO Karten speichern
-        //TODO Anzeige als Timeline?
 
-        return Spiel.Details(spielerHeim, spielerAuswaerts, torschuetzen)
+        return Spiel.Details(spielerHeim, spielerAuswaerts, auswechslungenHeim, auswechslungenAuswaerts, tore)
     }
-
     /**
      * getId holt die ID eines Vereins
      * @param rows Zeilen der Tabelle mit den Vereinsnamen
@@ -125,7 +136,7 @@ class ParsingSpielProvider {
             ?.removeSurrounding("/teams/", "/")
 
     /**
-     * getAufstellung parst die Aufstellung (bestehend aus Startelf und eingewechselten Spielern)
+     * getAufstellung parst die Startelf
      * @param tabelle Tabelle, in der die Aufstellung des gesuchten Vereins steht
      */
     private fun getAufstellung(tabelle: Element): List<Spieler> {
@@ -138,16 +149,50 @@ class ParsingSpielProvider {
             .map { (id, name) -> Spieler(name, id) }
             .toCollection(spieler)
 
-        val reserve = tabelle.select("tr:gt(11)")
-        reserve.asSequence()
-            .filter { it.selectFirst("td:eq(2)")?.text()?.isNotEmpty() == true }
-            .map { it.selectFirst("td:eq(1) > a") }
-            .map { it.attr("href") to it.attr("title") }
-            .map { (link, name) -> link.removeSurrounding("/spieler_profil/", "/") to name }
-            .map { (id, name) -> Spieler(name, id) }
-            .toCollection(spieler)
-
         return spieler
+    }
+
+    /**
+     * getAuswechslungen parst die Auswechslungen
+     * @param tabelle Tabelle, in der die Aufstellung des gesuchten Vereins steht
+     * @return Liste aller Auswechslungen, aufsteigend sortiert nach Spielminute
+     */
+    private fun getAuswechslungen(tabelle: Element): List<Auswechslung> {
+        val ausgewechseltTabelle =
+            tabelle.select("tr:lt(11)").filter { it.selectFirst("td:eq(2)")?.text()?.isNotEmpty() == true }
+        val ausgewechselt = mutableListOf<Pair<Spieler, Int>>()
+        for (zeile in ausgewechseltTabelle) {
+            val link = zeile.selectFirst("td:eq(1) > a") ?: continue
+            val name = link.attr("title")
+            val id = link.attr("href").removeSurrounding("/spieler_profil/", "/")
+
+            val spielminute = zeile.selectFirst("td:eq(2)")?.text()?.removeSuffix("'")?.toIntOrNull() ?: continue
+
+            ausgewechselt.add(Spieler(name, id) to spielminute)
+        }
+
+        val eingewechseltTabelle =
+            tabelle.select("tr:gt(11)").filter { it.selectFirst("td:eq(2)")?.text()?.isNotEmpty() == true }
+        val eingewechselt = mutableListOf<Pair<Spieler, Int>>()
+        for (zeile in eingewechseltTabelle) {
+            val link = zeile.selectFirst("td:eq(1) > a") ?: continue
+            val name = link.attr("title")
+            val id = link.attr("href").removeSurrounding("/spieler_profil/", "/")
+
+            val spielminute = zeile.selectFirst("td:eq(2)")?.text()?.removeSuffix("'")?.toIntOrNull() ?: continue
+
+            eingewechselt.add(Spieler(name, id) to spielminute)
+        }
+
+        val auswechslungen = mutableListOf<Auswechslung>()
+        for (aus in ausgewechselt) {
+            val ein = eingewechselt.firstOrNull { it.second == aus.second } ?: continue
+            eingewechselt.remove(ein)
+
+            auswechslungen.add(Auswechslung(ein.first, aus.first, ein.second))
+        }
+
+        return auswechslungen.sortedBy { it.spielminute }
     }
 
 }

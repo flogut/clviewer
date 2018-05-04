@@ -4,19 +4,11 @@ import java.time.LocalDate
 
 data class Spieler(
     val name: String,
-    val id: String,
-    var details: Details? = null
+    val id: String
 ) {
 
-    /**
-     * Lädt die Details dieses Spielers herunter und setzt sie als Wert von details, wenn details null ist
-     * @param provider Provider, der zum Download genutzt werden soll
-     */
-    fun loadDetails(provider: Provider) {
-        if (details != null) {
-            details = provider.getDetailsForSpieler(this)
-        }
-    }
+    var details: Details? = null
+        get() = field ?: ActiveProvider.getDetailsForSpieler(this).also { field = it }
 
     data class Details(
         val verein: Verein,

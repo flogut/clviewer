@@ -8,8 +8,7 @@ data class Spiel(
     val datum: LocalDate,
     val toreHeim: Int,
     val toreAuswaerts: Int,
-    val phase: String,
-    var details: Details? = null
+    val phase: String
 ) {
 
     val saison: Int by lazy {
@@ -20,22 +19,14 @@ data class Spiel(
         }
     }
 
-    /**
-     * Lädt die Details dieses Spiels herunter und setzt sie als Wert von details, wenn details null ist
-     * @param provider Provider, der zum Download genutzt werden soll
-     */
-    fun loadDetails(provider: Provider) {
-        if (details == null) {
-            details = provider.getDetailsForSpiel(this)
-        }
-    }
-
-    //TODO details zu einer lazy Property ändern? Problem: kein fester Provider => Provider als Singleton? (=> nur bei compilezeit festlegbar)
+    var details: Details? = null
+        get() = field ?: ActiveProvider.getDetailsForSpiel(this).also { field = it }
 
     data class Details(
-        // Spieler werden als Paar von ID und Name gespeichert, um unnötige Netzwerkanfragen zu vermeiden
         val spielerHeim: List<Spieler>,
         val spielerAuswaerts: List<Spieler>,
-        val torschuetzen: List<Spieler>
+        val auswechslungenHeim: List<Auswechslung>,
+        val auswechslungenAuswaerts: List<Auswechslung>,
+        val tore: List<Tor>
     )
 }

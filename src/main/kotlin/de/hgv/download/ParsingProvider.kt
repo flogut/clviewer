@@ -6,7 +6,7 @@ import java.net.URL
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-class ParsingProvider: Provider {
+open class ParsingProvider: Provider {
 
     private val spielerProvider = ParsingSpielerProvider()
     private val spielProvider = ParsingSpielProvider()
