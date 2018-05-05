@@ -1,6 +1,6 @@
 package de.hgv.view
 
-import de.hgv.controller.DataController
+import de.hgv.provider.ActiveProvider
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
@@ -15,11 +15,7 @@ import java.time.format.DateTimeFormatter
 
 class SpielerView: View() {
 
-    private val dataController: DataController by inject()
-    private val providerProperty = dataController.providerProperty
-    private var provider by providerProperty
-
-    private val spielerProperty = SimpleObjectProperty((params["id"] as? String)?.let { provider.getSpieler(it) })
+    private val spielerProperty = SimpleObjectProperty((params["id"] as? String)?.let { ActiveProvider.getSpieler(it) })
     private var spieler by spielerProperty
 
     private val name = spielerProperty.selectString { spieler -> spieler?.name }
@@ -93,7 +89,7 @@ class SpielerView: View() {
         }
 
         label("Spieler konnte nicht geladen werden") {
-            visibleWhen { spielerProperty.isNull }
+            removeWhen { spielerProperty.isNotNull }
             alignment = Pos.CENTER
             useMaxSize = true
             textAlignment = TextAlignment.CENTER
@@ -109,7 +105,7 @@ class SpielerView: View() {
 
                 val result = dialog.showAndWait()
                 result.ifPresent { name ->
-                    spieler = provider.getSpieler(name.replace(" ", "-").toLowerCase())
+                    spieler = ActiveProvider.getSpieler(name.replace(" ", "-").toLowerCase())
                 }
             }
             if (it.isControlDown && it.code == KeyCode.B) {
@@ -127,7 +123,7 @@ class SpielerView: View() {
             primaryStage.sizeToScene()
         }
 
-        spieler = provider.getSpieler("joshua-kimmich")
+        spieler = ActiveProvider.getSpieler("joshua-kimmich")
 
         runLater {
             root.requestFocus()
