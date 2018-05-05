@@ -50,19 +50,18 @@ open class ParsingProvider: Provider {
             val daheim = getVereinFromRow(row, 2) ?: continue
             val auswaerts = getVereinFromRow(row, 4) ?: continue
 
-            val ergebnis =
-                row.selectFirst("td:eq(5) > a")
-                    ?.text()
-                    ?.split(" ")
-                    ?.get(0)
-                    ?.split(":") ?: continue
+            val ergebnisText = row.selectFirst("td:eq(5) > a")?.text() ?: continue
+            val ergebnis = ergebnisText.substringBefore(" ").split(":")
+            val verlaengerung = ergebnisText.endsWith("n.V.")
+            val elfmeterschiessen = ergebnisText.endsWith("i.E.")
 
             val toreHeim = ergebnis[0].toIntOrNull() ?: continue
             val toreAuswaerts = ergebnis[1].toIntOrNull() ?: continue
 
             val phase = Phase.getValue(phaseString)
 
-            val spiel = Spiel(daheim, auswaerts, datum, toreHeim, toreAuswaerts, phase)
+            val spiel =
+                Spiel(daheim, auswaerts, datum, toreHeim, toreAuswaerts, verlaengerung, elfmeterschiessen, phase)
 
             spiele.add(spiel)
         }

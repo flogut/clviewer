@@ -59,7 +59,17 @@ class SpielProvider {
                 ?.substringAfter(", ")
         val datum = datumText?.let { LocalDate.parse(it, dtf) } ?: return null
 
-        val ergebnis = rows.getOrNull(1)?.selectFirst("td > .resultat")?.text()?.split(":") ?: return null
+        var ergebnisString = rows.getOrNull(1)?.selectFirst("td > .resultat")?.text() ?: return null
+        var verlaengerung = false
+        var elfmeterschiessen = false
+        if (ergebnisString.endsWith("n.V.")) {
+            verlaengerung = true
+            ergebnisString = ergebnisString.removeSuffix("n.V.").trim()
+        } else if (ergebnisString.endsWith("i.E.")) {
+            elfmeterschiessen = true
+            ergebnisString = ergebnisString.removeSuffix("i.E.").trim()
+        }
+        val ergebnis = ergebnisString.split(":")
         val toreHeim = ergebnis[0].toIntOrNull() ?: return null
         val toreAuswaerts = ergebnis[1].toIntOrNull() ?: return null
 
@@ -72,7 +82,7 @@ class SpielProvider {
                 ?.trim() ?: return null
         val phase = Phase.getValue(phaseString)
 
-        val spiel = Spiel(daheim, auswaerts, datum, toreHeim, toreAuswaerts, phase)
+        val spiel = Spiel(daheim, auswaerts, datum, toreHeim, toreAuswaerts, verlaengerung, elfmeterschiessen, phase)
 
         if (detailed) {
             spiel.details = getDetailsForSpiel(spiel)

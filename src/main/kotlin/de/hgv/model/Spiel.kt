@@ -9,10 +9,10 @@ data class Spiel(
     val datum: LocalDate,
     val toreHeim: Int,
     val toreAuswaerts: Int,
+    val verlaengerung: Boolean,
+    val elfmeterschiessen: Boolean,
     val phase: Phase
 ) {
-
-    //TODO Verlängerung
 
     val saison: Int by lazy {
         if (datum.isBefore(LocalDate.parse("${datum.year}-07-01"))) {
