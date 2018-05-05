@@ -100,10 +100,20 @@ class ParsingSpielProvider {
         val tore = mutableListOf<Tor>()
         for (tor in toreTabelle.select("tr:gt(0) > td:eq(1)")) {
             val torschuetze = tor.selectFirst("a")
-                ?.let { Spieler(it.attr("title"), it.attr("href").removeSurrounding("/spieler_profil/", "/")) }
+                ?.let {
+                    Spieler(
+                        it.attr("title"),
+                        it.attr("href").removeSurrounding("/spieler_profil/", "/")
+                    )
+                }
 
             val vorlagengeber = tor.selectFirst("a:gt(0)")
-                ?.let { Spieler(it.attr("title"), it.attr("href").removeSurrounding("/spieler_profil/", "/")) }
+                ?.let {
+                    Spieler(
+                        it.attr("title"),
+                        it.attr("href").removeSurrounding("/spieler_profil/", "/")
+                    )
+                }
 
             val spielminute = tor.ownText().substringBefore(". /").trim().toIntOrNull()
 
@@ -120,10 +130,20 @@ class ParsingSpielProvider {
 
         val auswechslungenAuswaerts = getAuswechslungen(spielerAuswaertsTabelle)
 
-        //TODO Karten speichern
+        val kartenHeim = getKarten(spielerHeimTabelle)
+        val kartenAuswaerts = getKarten(spielerAuswaertsTabelle)
 
-        return Spiel.Details(spielerHeim, spielerAuswaerts, auswechslungenHeim, auswechslungenAuswaerts, tore)
+        return Spiel.Details(
+            spielerHeim,
+            spielerAuswaerts,
+            auswechslungenHeim,
+            auswechslungenAuswaerts,
+            tore,
+            kartenHeim,
+            kartenAuswaerts
+        )
     }
+
     /**
      * getId holt die ID eines Vereins
      * @param rows Zeilen der Tabelle mit den Vereinsnamen
@@ -193,6 +213,36 @@ class ParsingSpielProvider {
         }
 
         return auswechslungen.sortedBy { it.spielminute }
+    }
+
+    /**
+     * getKarten parst die Karten aus der Aufstellungstabelle einer Mannschaft
+     * @param tabelle Ausfstellung des gesuchten Vereins
+     */
+    private fun getKarten(tabelle: Element): List<Karte> {
+        val zeilen = tabelle.select("td:has(img)")
+
+        val karten = mutableListOf<Karte>()
+
+        for (zeile in zeilen) {
+            val name = zeile.selectFirst("a")?.attr("title") ?: continue
+            val id = zeile.selectFirst("a")?.attr("href")?.removeSurrounding("/spieler_profil/", "/") ?: continue
+            val spieler = Spieler(name, id)
+
+            val spielminute = zeile.selectFirst("span")?.text()?.removeSuffix("'")?.toIntOrNull() ?: continue
+
+            val art = when (zeile.selectFirst("img").attr("alt")) {
+                "gelb" -> Kartenart.GELB
+                "rot" -> Kartenart.ROT
+                "gelb-rot" -> Kartenart.GELBROT
+                else -> null
+            } ?: continue
+
+            val karte = Karte(spieler, spielminute, art)
+            karten.add(karte)
+        }
+
+        return karten
     }
 
 }

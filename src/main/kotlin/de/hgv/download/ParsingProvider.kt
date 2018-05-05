@@ -10,6 +10,7 @@ open class ParsingProvider: Provider {
 
     private val spielerProvider = ParsingSpielerProvider()
     private val spielProvider = ParsingSpielProvider()
+    private val gruppeProvider = ParsingGruppeProvider()
 
     override fun getSpieler(id: String): Spieler? = spielerProvider.getSpieler(id)
 
@@ -64,6 +65,8 @@ open class ParsingProvider: Provider {
 
         return spiele
     }
+
+    override fun getTabelle(gruppe: String, saison: Int): Tabelle = gruppeProvider.getTabelle(gruppe, saison)
 
     private fun getVereinFromRow(row: Element, index: Int): Verein? {
         val link = row.selectFirst("td:eq($index) > a") ?: return null

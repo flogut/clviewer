@@ -27,6 +27,8 @@ data class Spiel(
         val spielerAuswaerts: List<Spieler>,
         val auswechslungenHeim: List<Auswechslung>,
         val auswechslungenAuswaerts: List<Auswechslung>,
-        val tore: List<Tor>
+        val tore: List<Tor>,
+        val kartenHeim: List<Karte>,
+        val kartenAuswaerts: List<Karte>
     )
 }
