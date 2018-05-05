@@ -131,11 +131,13 @@ class SpielProvider {
 
             val eigentor = tor.ownText().contains("Eigentor")
 
+            val elfmeter = tor.ownText().contains("Elfmeter")
+
             if (torschuetze == null || spielminute == null) {
                 continue
             }
 
-            tore.add(Tor(torschuetze, vorlagengeber, spielminute, eigentor))
+            tore.add(Tor(torschuetze, vorlagengeber, spielminute, eigentor, elfmeter))
         }
 
         val auswechslungenHeim = getAuswechslungen(spielerHeimTabelle)
