@@ -49,9 +49,9 @@ interface Provider {
     fun getSpiele(saison: Int): List<Spiel>
 
     /**
-     * getTabelle lädt die Tabelle einer Gruppe herunter
-     * @param gruppe Gruppenname (z.B. "Gruppe A")
-     * @param saison Jahr, in dem das Finale stattfindet (z.B. Saison 2017/2018 => 2018)
+     * getTabelle lädt die Tabelle (Platzierung, Tordifferenz, Punktzahl) einer Gruppe aus der Gruppenphase herunter
+     * @param gruppe Name der Gruppe (z.B. "Gruppe A")
+     * @param saison Jahr, in dem das Finale stattfindet (z.B. 2017/2018 => 2018)
      */
     fun getTabelle(gruppe: String, saison: Int): Tabelle?
 
