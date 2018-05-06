@@ -7,7 +7,7 @@ import java.net.URL
 
 class TabelleProvider {
 
-    fun getTabelle(gruppe: String, saison: Int): Tabelle {
+    fun getTabelle(gruppe: String, saison: Int): Tabelle? {
         val doc = Jsoup.parse(
             URL(
                 "http://www.weltfussball.de/spielplan/champions-league-${saison - 1}-$saison-${gruppe.toLowerCase().replace(
@@ -17,17 +17,25 @@ class TabelleProvider {
             ), 5000
         )
 
-        val zeilen = doc.select(".box > .data > .standard_tabelle > tbody > tr:not(:has(th))")
-        val tabelle = mutableListOf<Pair<Verein, Int>>()
+        val zeilen = doc.select(".box > .data > .standard_tabelle:contains(Mannschaft) > tbody > tr:not(:has(th))")
+        val tabelle = mutableListOf<Tabelle.Zeile>()
 
         for (zeile in zeilen) {
+            val platz = zeile.selectFirst("td")?.text()?.toIntOrNull() ?: continue
+
             val name = zeile.selectFirst("a")?.attr("title") ?: continue
             val id = zeile.selectFirst("a")?.attr("href")?.removeSurrounding("/teams/", "/") ?: continue
             val verein = Verein(name, id)
 
+            val tordifferenz = zeile.selectFirst("td:eq(8)")?.text()?.toIntOrNull() ?: continue
+
             val punkte = zeile.selectFirst("td:eq(9)")?.text()?.toIntOrNull() ?: continue
 
-            tabelle.add(verein to punkte)
+            tabelle.add(Tabelle.Zeile(platz, verein, tordifferenz, punkte))
+        }
+
+        if (tabelle.size != 4) {
+            return null
         }
 
         return Tabelle(gruppe, tabelle)

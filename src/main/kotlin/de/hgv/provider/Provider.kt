@@ -53,6 +53,6 @@ interface Provider {
      * @param gruppe Gruppenname (z.B. "Gruppe A")
      * @param saison Jahr, in dem das Finale stattfindet (z.B. Saison 2017/2018 => 2018)
      */
-    fun getTabelle(gruppe: String, saison: Int): Tabelle
+    fun getTabelle(gruppe: String, saison: Int): Tabelle?
 
 }
