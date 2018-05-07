@@ -1,9 +1,6 @@
 package de.hgv.provider
 
-import de.hgv.model.Spiel
-import de.hgv.model.Spieler
-import de.hgv.model.Tabelle
-import de.hgv.model.Verein
+import de.hgv.model.*
 
 interface Provider {
 
@@ -47,6 +44,13 @@ interface Provider {
      * @param saison Jahr, in dem das Finale stattfindet (z.B. Saison 2017/2018 => 2018)
      */
     fun getSpiele(saison: Int): List<Spiel>
+
+    /**
+     * getSpieleInPhase lädt eine List aller Spiele einer Phase einer Saison herunter (ohne Aufstellungen, Torschützen => Spiel.Details)
+     * @param phase Phase der Saison
+     * @param saison Jahr, in dem das Finale stattfindet (z.B. Saison 2017/2018 => 2018)
+     */
+    fun getSpieleInPhase(phase: Phase, saison: Int): List<Spiel> = getSpiele(saison).filter { it.phase == phase }
 
     /**
      * getTabelle lädt die Tabelle (Platzierung, Tordifferenz, Punktzahl) einer Gruppe aus der Gruppenphase herunter

@@ -14,12 +14,21 @@ import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.runBlocking
 import tornadofx.*
 import java.net.URL
+import java.time.LocalDate
 
 class GruppeDetailedView: Fragment() {
 
+    val saison = params["saison"] as? Int ?: LocalDate.now().let {
+        if (it.isBefore(LocalDate.of(it.year, 7, 1))) {
+            it.year
+        } else {
+            it.year - 1
+        }
+    }
+
     val phase = params["phase"] as? Phase ?: Phase.GRUPPE_A
-    val tabelle = ActiveProvider.getTabelle(phase.toString(), 2018)
-    val spiele = ActiveProvider.getSpiele(2018).filter { it.phase == phase }.sortedBy { it.datum }.observable()
+    val tabelle = ActiveProvider.getTabelle(phase.toString(), saison)
+    val spiele = ActiveProvider.getSpieleInPhase(phase, saison).sortedBy { it.datum }
 
     override val root = vbox {
         useMaxSize = true
@@ -157,7 +166,22 @@ class GruppeDetailedView: Fragment() {
                 result.ifPresent {
                     val phase = Phase.getValue(it)
                     this@GruppeDetailedView.replaceWith(
-                        find<GruppeDetailedView>(mapOf("phase" to phase)),
+                        find<GruppeDetailedView>(mapOf("phase" to phase, "saison" to saison)),
+                        ViewTransition.Fade(0.15.seconds)
+                    )
+                }
+            } else if (it.isControlDown && it.code == KeyCode.S) {
+                it.consume()
+
+                val dialog = TextInputDialog()
+                dialog.headerText = "Saison auswählen"
+                dialog.title = "Saison auswählen"
+
+                val result = dialog.showAndWait()
+                result.ifPresent {
+                    val saison = it.toIntOrNull()
+                    this@GruppeDetailedView.replaceWith(
+                        find<GruppeDetailedView>(mapOf("phase" to phase, "saison" to saison)),
                         ViewTransition.Fade(0.15.seconds)
                     )
                 }
@@ -172,6 +196,6 @@ class GruppeDetailedView: Fragment() {
             root.requestFocus()
         }
 
-        title = phase.toString()
+        title = "$phase (Saison ${saison - 1}/$saison)"
     }
 }
