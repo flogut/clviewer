@@ -1,6 +1,6 @@
 package de.hgv.app
 
-import de.hgv.view.GruppeDetailedView
+import de.hgv.view.SpielerView
 import tornadofx.*
 
-class CLViewer: App(GruppeDetailedView::class, Styles::class)
+class CLViewer: App(SpielerView::class, Styles::class)
