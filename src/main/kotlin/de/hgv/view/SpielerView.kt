@@ -10,10 +10,8 @@ import javafx.scene.input.KeyCode
 import javafx.scene.layout.RowConstraints
 import javafx.scene.text.Font
 import javafx.scene.text.TextAlignment
-import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.runBlocking
 import tornadofx.*
-import java.net.URL
 import java.time.format.DateTimeFormatter
 
 class SpielerView: Fragment() {
@@ -32,18 +30,9 @@ class SpielerView: Fragment() {
                 )
 
                 runBlocking {
-                    urls
-                        .map {
-                            async {
-                                URL(it).openConnection().apply {
-                                    setRequestProperty(
-                                        "user-agent",
-                                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0"
-                                    )
-                                }.getInputStream()
-                            }
-                        }
+                    urls.map { download(it) }
                         .map { it.await() }
+                        //TODO NPE abfangen => Nicht-gefunden Bild anzeigen, wenn der InputStream null ist
                         .map { Image(it) }
                 }
             } ui { bilder ->
