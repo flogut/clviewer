@@ -13,7 +13,7 @@
         <kotlin.version>1.2.40</kotlin.version>
         <tornadofx.version>1.7.14</tornadofx.version>
         <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
-        <main.class>de.hgv.app.CLViewer</main.class>
+        <main.class>de.hgv.app.CLViewerKt</main.class>
     </properties>
 
     <pluginRepositories>
@@ -171,6 +171,18 @@
                         <version>5.2.0</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>com.zenjava</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>8.8.3</version>
+                <configuration>
+                    <mainClass>${main.class}</mainClass>
+                    <jfxMainAppJarName>clviewer.jar</jfxMainAppJarName>
+                    <vendor>Humboldt-Gymnasium Vaterstetten</vendor>
+                    <appName>clviewer</appName>
+                    <verbose>true</verbose>
+                </configuration>
             </plugin>
         </plugins>
     </build>
