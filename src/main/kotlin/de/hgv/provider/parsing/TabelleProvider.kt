@@ -14,6 +14,7 @@ class TabelleProvider {
      * getTabelle lädt die Tabelle (Platzierung, Tordifferenz, Punktzahl) einer Gruppe aus der Gruppenphase herunter
      * @param gruppe Name der Gruppe (z.B. "Gruppe A")
      * @param saison Jahr, in dem das Finale stattfindet (z.B. 2017/2018 => 2018)
+     * @return Die Tabelle, oder null, wenn ein Fehler auftritt
      */
     fun getTabelle(gruppe: String, saison: Int): Tabelle? {
         val doc = Jsoup.parse(

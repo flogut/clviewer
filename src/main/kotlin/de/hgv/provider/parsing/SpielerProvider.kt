@@ -16,6 +16,7 @@ class SpielerProvider {
     /**
      * getSpieler parst alle Daten zu einem Spieler
      * @param id ID des Spielers
+     * @return Den Spieler, oder null, wenn die ID ungültig ist
      */
     fun getSpieler(id: String): Spieler? {
         val doc = Jsoup.parse(URL("http://www.weltfussball.de/spieler_profil/$id"), 5000)
@@ -69,6 +70,7 @@ class SpielerProvider {
     /**
      * getDetailsForSpieler parst die Details zu einem Spieler
      * @param spieler Spieler, dessen Details geparst werden sollen
+     * @return Die Details, oder null, wenn ein Fehler auftritt
      */
     fun getDetailsForSpieler(spieler: Spieler): Spieler.Details? {
         return getSpieler(spieler.id)?.details
@@ -79,6 +81,7 @@ class SpielerProvider {
      * Gibt es nun eine Zeile, deren erste Spalte text enthält, dann gibt getTextFromTable den Text der rechten Spalte dieser Zeile zurück.
      * @param rows Zeilen einer Tabelle
      * @param text Text, nach dem gesucht wird
+     * @return Den Text der rechten Spalte oder null, wenn der gesuchte Text nicht gefunden wird
      */
     private fun getTextFromTable(rows: Elements, text: String): String? = rows.select("tr:contains($text)")
         .firstOrNull()
@@ -91,6 +94,7 @@ class SpielerProvider {
      * Gibt es nun eine Zeile, deren erste Spalte text enthält, dann gibt getHtmlFromTable den HTML-Code der rechten Spalte dieser Zeile zurück.
      * @param rows Zeilen einer Tabelle
      * @param text Text, nach dem gesucht wird
+     * @return Den HTML-Code der rechten Spalte oder null, wenn der gesuchte Text nicht gefunden wird
      */
     private fun getHtmlFromTable(rows: Elements, text: String): String? = rows.select("tr:contains($text)")
         .firstOrNull()

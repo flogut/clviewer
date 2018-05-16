@@ -20,6 +20,7 @@ class SpielProvider {
      * @param daheim Heimmannschaft
      * @param auswaerts Auswärtsmannschaft
      * @param detailed Falls true werden die Details des Spiels geparst (Aufstellungen, Torschützen)
+     * @return Das Spiel, oder null, wenn ein Fehler auftritt
      */
     fun getSpiel(saison: Int, phase: String, daheim: Verein, auswaerts: Verein, detailed: Boolean): Spiel? {
         val linkPhase = phase.replace(" ", "-").toLowerCase()
@@ -32,6 +33,7 @@ class SpielProvider {
      * getSpiel parst die Daten zu einem Spiel
      * @param link Letzter Teil des Links zur Spielübersicht
      * @param detailed Falls true werden die Details des Spiels geparst (Aufstellungen, Torschützen)
+     * @return Das Spiel, oder null, wenn ein Fehler auftritt
      */
     fun getSpiel(link: String, detailed: Boolean): Spiel? {
         val doc = Jsoup.parse(URL(link), 5000)
@@ -97,6 +99,7 @@ class SpielProvider {
     /**
      * getDetailsForSpiel parst die Details zu einem Spiel (Aufstellungen, Torschützen)
      * @param spiel Spiel, dessen Details geparst werden sollen
+     * @return Die Details, oder null, wenn ein Fehler auftritt
      */
     fun getDetailsForSpiel(spiel: Spiel): Spiel.Details? {
         val linkPhase = spiel.phase.toLink()
@@ -165,6 +168,7 @@ class SpielProvider {
      * getId holt die ID eines Vereins
      * @param rows Zeilen der Tabelle mit den Vereinsnamen
      * @param index Index der Spalte, in der der Name des Vereins, dessen ID gesucht wird, steht
+     * @return Die ID, oder null, wenn die ID nicht gefunden wird
      */
     private fun getId(rows: Elements, index: Int): String? =
         rows.firstOrNull()
