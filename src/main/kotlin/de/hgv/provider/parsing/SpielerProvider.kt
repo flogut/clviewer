@@ -8,6 +8,9 @@ import java.net.URL
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+/**
+ * @author Florian Gutekunst
+ */
 class SpielerProvider {
 
     /**

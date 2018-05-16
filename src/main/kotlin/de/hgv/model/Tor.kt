@@ -1,5 +1,8 @@
 package de.hgv.model
 
+/**
+ * @author Florian Gutekunst
+ */
 data class Tor(
     val torschuetze: Spieler,
     val vorlagengeber: Spieler?,

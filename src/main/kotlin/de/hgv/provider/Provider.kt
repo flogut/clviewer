@@ -2,6 +2,9 @@ package de.hgv.provider
 
 import de.hgv.model.*
 
+/**
+ * Definiert die Methoden für den Zugriff auf die benötigten Daten
+ */
 interface Provider {
 
     /**

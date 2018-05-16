@@ -8,6 +8,12 @@ import java.net.URL
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+/**
+ * Der ParsingProvider lädt die benötigten Daten von einer Website herunter und parst sie dann.
+ * Die einzige Instanz dieser Klasse die erstellt werden soll, ist der ActiveProvider.
+ *
+ * @author Florian Gutekunst
+ */
 open class ParsingProvider: Provider {
 
     private val spielerProvider = SpielerProvider()

@@ -14,8 +14,17 @@ import kotlinx.coroutines.experimental.runBlocking
 import tornadofx.*
 import java.time.LocalDate
 
+/**
+ * Stellt die zu einer Gruppe die Tabelle und die Spiele (sortiert nach Datum) einer Saison dar. Die Gruppe und die Saison werden über die params von TornadoFX mit den Keys "phase" und "saison" übergeben
+ * TODO Statt params Konstruktor verwenden?
+ *
+ * @author Florian Gutekunst
+ */
 class GruppeDetailedView: Fragment() {
 
+    /**
+     * Wird keine Saison übergeben, wird die aktuelle Saison genutzt
+     */
     val saison = params["saison"] as? Int ?: LocalDate.now().let {
         if (it.isBefore(LocalDate.of(it.year, 7, 1))) {
             it.year
@@ -37,6 +46,7 @@ class GruppeDetailedView: Fragment() {
             vgrow = Priority.ALWAYS
 
             runAsyncWithOverlay {
+                // Download der Wappen während ein Ladekreis angezeigt wird => Gibt eine Map von Verein zu Wappen zurück
                 runBlocking {
                     tabelle?.tabelle
                         ?.map { it.verein }
@@ -47,6 +57,7 @@ class GruppeDetailedView: Fragment() {
                         ?.toMap() ?: mapOf()
                 }
             } ui { wappen ->
+                // Überschrift Tabelle
                 label("Tabelle") {
                     useMaxWidth = true
                     textAlignment = TextAlignment.CENTER
@@ -54,11 +65,13 @@ class GruppeDetailedView: Fragment() {
                     font = Font.font(font.family, FontWeight.BOLD, 30.0)
                 }
 
+                // Tabelle
                 gridpane {
                     hgap = 10.0
                     vgap = 3.0
                     alignment = Pos.TOP_CENTER
 
+                    // Kopfzeile
                     row {
                         label("Platz")
 
@@ -78,23 +91,29 @@ class GruppeDetailedView: Fragment() {
 
                     for (zeile in tabelle?.tabelle ?: listOf()) {
                         row {
+                            // Platzierung
                             label(zeile.platz.toString())
 
+                            // Wappen
                             imageview(wappen.getValue(zeile.verein)) {
                                 fitWidth = 25.0
                                 isPreserveRatio = true
                                 isSmooth = true
                             }
 
+                            // Name
                             label(zeile.verein.name)
 
+                            // Tordifferenz
                             label(zeile.tordifferenz.toString())
 
+                            // Punkte
                             label(zeile.punkte.toString())
                         }
                     }
                 }
 
+                // Überschrift Spiele
                 label("Spiele") {
                     useMaxWidth = true
                     textAlignment = TextAlignment.CENTER
@@ -102,6 +121,7 @@ class GruppeDetailedView: Fragment() {
                     font = Font.font(font.family, FontWeight.BOLD, 30.0)
                 }
 
+                // Für eine schöne Anordnung, werden die Spiele wie eine Tabelle dargestellt
                 gridpane {
                     hgap = 10.0
                     vgap = 3.0
@@ -109,30 +129,36 @@ class GruppeDetailedView: Fragment() {
 
                     for (spiel in spiele) {
                         row {
+                            // Wappen Heimmannschaft
                             imageview(wappen.getValue(spiel.daheim)) {
                                 fitWidth = 35.0
                                 isPreserveRatio = true
                                 isSmooth = true
                             }
 
+                            // Name Heimmannschaft
                             label(spiel.daheim.name)
 
+                            // Tore Heimmannschaft
                             label(spiel.toreHeim.toString()) {
                                 paddingLeft = 10
                             }
 
                             label(" : ")
 
+                            // Tore Auswärtsmannschaft
                             label(spiel.toreAuswaerts.toString()) {
                                 paddingRight = 10
                             }
 
+                            // Name Auswärtsmannschaft
                             label(spiel.auswaerts.name) {
                                 useMaxWidth = true
                                 textAlignment = TextAlignment.RIGHT
                                 alignment = Pos.CENTER_RIGHT
                             }
 
+                            // Wappen Auswärtsmannschaft
                             imageview(wappen.getValue(spiel.auswaerts)) {
                                 fitWidth = 35.0
                                 isPreserveRatio = true
@@ -144,6 +170,7 @@ class GruppeDetailedView: Fragment() {
             }
         }
 
+        //TODO Entfernen (Nur für Navigation während des Debuggings)
         setOnKeyPressed {
             if (it.isControlDown && it.code == KeyCode.F) {
                 it.consume()
@@ -177,14 +204,14 @@ class GruppeDetailedView: Fragment() {
                 }
             }
         }
+
+        runLater {
+            requestFocus()
+        }
     }
 
     init {
         primaryStage.isMaximized = true
-
-        runLater {
-            root.requestFocus()
-        }
 
         title = "$phase (Saison ${saison - 1}/$saison)"
     }

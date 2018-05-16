@@ -5,6 +5,9 @@ import de.hgv.model.Verein
 import org.jsoup.Jsoup
 import java.net.URL
 
+/**
+ * @author Florian Gutekunst
+ */
 class TabelleProvider {
 
     /**
