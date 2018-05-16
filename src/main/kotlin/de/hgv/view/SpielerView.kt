@@ -15,7 +15,7 @@ import tornadofx.*
 import java.time.format.DateTimeFormatter
 
 /**
- * Stellt die Details zu einem Spieler dar. Die ID des Spielers wird über die params von TornadoFX übergeben mit dem Key "id"
+ * Stellt die Details zu einem Spieler dar. Die ID des Spielers wird über die params von TornadoFX übergeben mit dem Key "id". <br>
  * TODO Statt params Konstruktor verwenden?
  *
  * @author Florian Gutekunst

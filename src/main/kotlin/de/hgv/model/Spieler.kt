@@ -4,8 +4,6 @@ import de.hgv.provider.ActiveProvider
 import java.time.LocalDate
 
 /**
- * Die Details des Spielers werden beim ersten Zugriff heruntergeladen und gespeichert. Dieser dauert also potenziell etwas länger.
- *
  * @author Florian Gutekunst
  */
 data class Spieler(
@@ -13,6 +11,9 @@ data class Spieler(
     val id: String
 ) {
 
+    /**
+     * Die Details des Spielers werden beim ersten Zugriff heruntergeladen und gespeichert. Dieser dauert also potenziell etwas länger.
+     */
     var details: Details? = null
         get() = field ?: ActiveProvider.getDetailsForSpieler(this).also { field = it }
 
