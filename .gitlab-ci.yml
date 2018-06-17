@@ -1,28 +1,28 @@
 stages:
-  - build
-  - test
-  - deploy
-  
+ - build
+ - test
+ - deploy
+
 build:
   stage: build
   script: mvn clean validate compile
   artifacts:
     paths:
     - detekt/
-	expire_in: 1 week
-  
+    expire_in: 1 week
+
 test:
   stage: test
   script: mvn test
-  
-jar: 
+
+jar:
   stage: deploy
   script: mvn package
   artifacts:
     paths:
     - target/*-jar-with-dependencies.jar
-	expire_in: 1 week
-  
+    expire_in: 1 week
+
 native:
   stage: deploy
   script: mvn jfx:native
