@@ -7,9 +7,11 @@ import java.net.MalformedURLException
 import java.net.URL
 
 /**
- * Lädt die Website, die unter url zu finden ist, asynchron herunter. Da manche Websites den Java User-Agent blockieren, wird hier der Firefox User-Agent genutzt.
+ * Lädt die Website, die unter url zu finden ist, asynchron herunter. Da manche Websites den Java User-Agent blockieren,
+ * wird hier der Firefox User-Agent genutzt.
  * @param url URL der Website, die heruntergeladen werden soll
- * @return Es wird ein Deferred<InputStream> zurückgegeben. Um auf den InputStream tatsächlich zuzugreifen, muss noch die await() Methode aufgerufen werden.
+ * @return Es wird ein Deferred<InputStream> zurückgegeben. Um auf den InputStream tatsächlich zuzugreifen, muss noch
+ * die await() Methode aufgerufen werden.
  *
  * @author Florian Gutekunst
  */
@@ -26,4 +28,3 @@ fun download(url: String?): Deferred<InputStream?> = async {
         null
     }
 }
-

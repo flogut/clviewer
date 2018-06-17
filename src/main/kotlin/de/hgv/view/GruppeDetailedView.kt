@@ -11,7 +11,22 @@ import javafx.scene.text.Font
 import javafx.scene.text.FontWeight
 import javafx.scene.text.TextAlignment
 import kotlinx.coroutines.experimental.runBlocking
-import tornadofx.*
+import tornadofx.Fragment
+import tornadofx.ViewTransition
+import tornadofx.gridpane
+import tornadofx.gridpaneConstraints
+import tornadofx.imageview
+import tornadofx.label
+import tornadofx.paddingLeft
+import tornadofx.paddingRight
+import tornadofx.row
+import tornadofx.runAsyncWithOverlay
+import tornadofx.runLater
+import tornadofx.seconds
+import tornadofx.useMaxSize
+import tornadofx.useMaxWidth
+import tornadofx.vbox
+import tornadofx.vgrow
 import java.time.LocalDate
 
 /**
@@ -24,7 +39,7 @@ import java.time.LocalDate
 class GruppeDetailedView: Fragment() {
 
     /**
-     * Wird keine Saison übergeben, wird die aktuelle Saison genutzt
+     * Wird keine Saison übergeben, wird die aktuelle Saison genutzt.
      */
     val saison = params["saison"] as? Int ?: LocalDate.now().let {
         if (it.isBefore(LocalDate.of(it.year, 7, 1))) {
@@ -53,7 +68,7 @@ class GruppeDetailedView: Fragment() {
                         ?.map { it.verein }
                         ?.map { it to download(it.wappenURL) }
                         ?.map { (verein, job) -> verein to job.await() }
-                        //TODO NPE abfangen => Nicht-gefunden Bild anzeigen, wenn der InputStream null ist
+                        // TODO NPE abfangen => Nicht-gefunden Bild anzeigen, wenn der InputStream null ist
                         ?.map { (verein, inputStream) -> verein to Image(inputStream) }
                         ?.toMap() ?: mapOf()
                 }
@@ -171,7 +186,7 @@ class GruppeDetailedView: Fragment() {
             }
         }
 
-        //TODO Entfernen (Nur für Navigation während des Debuggings)
+        // TODO Entfernen (Nur für Navigation während des Debuggings)
         setOnKeyPressed {
             if (it.isControlDown && it.code == KeyCode.F) {
                 it.consume()

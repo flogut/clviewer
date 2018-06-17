@@ -12,6 +12,7 @@ build:
     paths:
     - detekt/
     expire_in: 1 week
+    when: always
 
 test:
   stage: test
@@ -24,6 +25,7 @@ jar:
     paths:
     - target/*-jar-with-dependencies.jar
     expire_in: 1 week
+  when: manual
 
 native:
   stage: deploy
@@ -32,3 +34,4 @@ native:
     paths:
     - target/jfx/native/*.exe
     expire_in: 1 week
+  when: manual

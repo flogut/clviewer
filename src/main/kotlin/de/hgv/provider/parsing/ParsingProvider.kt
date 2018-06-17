@@ -1,6 +1,10 @@
 package de.hgv.provider.parsing
 
-import de.hgv.model.*
+import de.hgv.model.Phase
+import de.hgv.model.Spiel
+import de.hgv.model.Spieler
+import de.hgv.model.Tabelle
+import de.hgv.model.Verein
 import de.hgv.provider.Provider
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element

@@ -28,7 +28,6 @@ internal class SpielerProviderTest {
         fun `Unbenutze ID`() {
             assertNull(spielerProvider.getSpieler("ungültige ID"))
         }
-
     }
 
     @Nested
@@ -70,7 +69,6 @@ internal class SpielerProviderTest {
 
                 assertEquals(details, spielerProvider.getDetailsForSpieler(spieler))
             }
-
         }
 
         @Test
@@ -78,6 +76,5 @@ internal class SpielerProviderTest {
             val spieler = Spieler("Ungültige ID", "ungültige ID")
             assertNull(spielerProvider.getDetailsForSpieler(spieler))
         }
-
     }
 }

@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter
 class SpielerProvider {
 
     /**
-     * getSpieler parst alle Daten zu einem Spieler
+     * getSpieler parst alle Daten zu einem Spieler.
      * @param id ID des Spielers
      * @return Den Spieler, oder null, wenn die ID ungültig ist
      */
@@ -27,7 +27,8 @@ class SpielerProvider {
         val rows = tabelle.select("tr")
 
         val dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        val geburtstag = getTextFromTable(rows, "geboren am:")?.let { LocalDate.parse(it, dateTimeFormatter) }
+        val geburtstag =
+            getTextFromTable(rows, "geboren am:")?.let { LocalDate.parse(it, dateTimeFormatter) }
 
         val land = getTextFromTable(rows, "Nationalität:")?.split(" ")?.firstOrNull()
 
@@ -49,7 +50,8 @@ class SpielerProvider {
             ?.toIntOrNull()
 
         val vereinName =
-            doc.selectFirst("table.standard_tabelle > tbody > tr:contains(#) > td:eq(1) > a")?.text() ?: return null
+            doc.selectFirst("table.standard_tabelle > tbody > tr:contains(#) > td:eq(1) > a")
+                ?.text() ?: return null
 
         val vereinId =
             doc.selectFirst("table.standard_tabelle > tbody > tr:contains(#) > td:eq(1) > a")
@@ -60,7 +62,8 @@ class SpielerProvider {
 
         val portraitUrl = doc.selectFirst("div.data[itemprop=image] > img")?.attr("src")
 
-        val details = Spieler.Details(verein, positionen, nummer, land, geburtstag, groesse, spielfuss, portraitUrl)
+        val details =
+            Spieler.Details(verein, positionen, nummer, land, geburtstag, groesse, spielfuss, portraitUrl)
         val spieler = Spieler(name, id)
         spieler.details = details
 
@@ -68,17 +71,16 @@ class SpielerProvider {
     }
 
     /**
-     * getDetailsForSpieler parst die Details zu einem Spieler
+     * getDetailsForSpieler parst die Details zu einem Spieler.
      * @param spieler Spieler, dessen Details geparst werden sollen
      * @return Die Details, oder null, wenn ein Fehler auftritt
      */
-    fun getDetailsForSpieler(spieler: Spieler): Spieler.Details? {
-        return getSpieler(spieler.id)?.details
-    }
+    fun getDetailsForSpieler(spieler: Spieler): Spieler.Details? = getSpieler(spieler.id)?.details
 
     /**
-     * Sei eine aus zwei Spalten bestehende Tabelle mit den Zeilen rows gegeben.
-     * Gibt es nun eine Zeile, deren erste Spalte text enthält, dann gibt getTextFromTable den Text der rechten Spalte dieser Zeile zurück.
+     * Es wird eine aus zwei Spalten bestehende Tabelle mit den Zeilen rows übergegeben.
+     * Gibt es nun eine Zeile, deren erste Spalte text enthält, dann gibt getTextFromTable den Text der rechten Spalte
+     * dieser Zeile zurück.
      * @param rows Zeilen einer Tabelle
      * @param text Text, nach dem gesucht wird
      * @return Den Text der rechten Spalte oder null, wenn der gesuchte Text nicht gefunden wird
@@ -90,8 +92,9 @@ class SpielerProvider {
         ?.text()
 
     /**
-     * Sei eine aus zwei Spalten bestehende Tabelle mit den Zeilen rows gegeben.
-     * Gibt es nun eine Zeile, deren erste Spalte text enthält, dann gibt getHtmlFromTable den HTML-Code der rechten Spalte dieser Zeile zurück.
+     * Er wird eine aus zwei Spalten bestehende Tabelle mit den Zeilen rows übergeben.
+     * Gibt es nun eine Zeile, deren erste Spalte text enthält, dann gibt getHtmlFromTable den HTML-Code der rechten
+     * Spalte dieser Zeile zurück.
      * @param rows Zeilen einer Tabelle
      * @param text Text, nach dem gesucht wird
      * @return Den HTML-Code der rechten Spalte oder null, wenn der gesuchte Text nicht gefunden wird
@@ -101,5 +104,4 @@ class SpielerProvider {
         ?.select("td")
         ?.get(1)
         ?.html()
-
 }

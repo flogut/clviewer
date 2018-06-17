@@ -23,7 +23,6 @@ internal class ParsingProviderTest {
         fun `Ungültiger Input`() {
             assertEquals(0, parsingProvider.getSpiele(2033).size, "Die Anzahl der Spiele ist inkorrekt")
         }
-
     }
 
     @Nested
@@ -46,5 +45,4 @@ internal class ParsingProviderTest {
             )
         }
     }
-
 }

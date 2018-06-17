@@ -89,14 +89,12 @@ internal class SpielProviderTest {
                         )
                     )
                 }
-
             }
 
             @Test
             fun `Ungültiger Input`() {
                 assertNull(spielProvider.getSpiel("http://www.weltfussball.de/spielbericht/ungueltig/", false))
             }
-
         }
 
         @Nested
@@ -114,7 +112,6 @@ internal class SpielProviderTest {
                     elfmeterschiessen = false,
                     phase = Phase.FINALE
                 )
-
 
                 assertEquals(
                     spiel, spielProvider.getSpiel(
@@ -168,11 +165,8 @@ internal class SpielProviderTest {
                         )
                     )
                 }
-
             }
-
         }
-
     }
 
     @Nested
@@ -182,7 +176,7 @@ internal class SpielProviderTest {
             val spiel = spielProvider.getSpiel(
                 "http://www.weltfussball.de/spielbericht/champions-league-2011-2012-halbfinale-real-madrid-bayern-muenchen/",
                 false
-            ) ?: throw Exception()
+            ) ?: throw Exception("Spiel ist null")
 
             val details = spielProvider.getDetailsForSpiel(spiel)
 
@@ -214,6 +208,5 @@ internal class SpielProviderTest {
 
             assertNull(spielProvider.getDetailsForSpiel(spiel))
         }
-
     }
 }

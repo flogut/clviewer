@@ -3,6 +3,9 @@ package de.hgv.model
 import de.hgv.provider.ActiveProvider
 import java.time.LocalDate
 
+/**
+ * @author Florian Gutekunst
+ */
 data class Spiel(
     val daheim: Verein,
     val auswaerts: Verein,

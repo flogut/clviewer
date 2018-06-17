@@ -18,6 +18,8 @@ test-pattern: # Configure exclusions for test sources
     - 'StringLiteralDuplication'
     - 'SpreadOperator'
     - 'TooManyFunctions'
+    - 'TooGenericExceptionThrown'
+    - 'UseDataClass'
 
 build:
   warningThreshold: 5
@@ -57,7 +59,7 @@ output-reports:
 comments:
   active: true
   CommentOverPrivateFunction:
-    active: true
+    active: false
   CommentOverPrivateProperty:
     active: false
   EndOfSentenceFormat:
@@ -65,10 +67,10 @@ comments:
     endOfSentenceFormat: ([.?!][ \t\n\r\f<])|([.?!]$)
   UndocumentedPublicClass:
     active: true
-    searchInNestedClass: true
-    searchInInnerClass: true
-    searchInInnerObject: true
-    searchInInnerInterface: true
+    searchInNestedClass: false
+    searchInInnerClass: false
+    searchInInnerObject: false
+    searchInInnerInterface: false
   UndocumentedPublicFunction:
     active: true
 
@@ -345,7 +347,7 @@ style:
   RedundantVisibilityModifierRule:
     active: true
   ReturnCount:
-    active: true
+    active: false
     max: 2
     excludedFunctions: "equals"
   SafeCast:

@@ -12,7 +12,8 @@ data class Spieler(
 ) {
 
     /**
-     * Die Details des Spielers werden beim ersten Zugriff heruntergeladen und gespeichert. Dieser dauert also potenziell etwas länger.
+     * Die Details des Spielers werden beim ersten Zugriff heruntergeladen und gespeichert. Dieser dauert also
+     * potenziell etwas länger.
      */
     var details: Details? = null
         get() = field ?: ActiveProvider.getDetailsForSpieler(this).also { field = it }

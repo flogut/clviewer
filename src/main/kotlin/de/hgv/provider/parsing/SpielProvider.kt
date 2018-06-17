@@ -1,7 +1,15 @@
 package de.hgv.provider.parsing
 
-import de.hgv.model.*
+import de.hgv.model.Auswechslung
+import de.hgv.model.Karte
+import de.hgv.model.Kartenart
+import de.hgv.model.Phase
+import de.hgv.model.Spiel
+import de.hgv.model.Spieler
+import de.hgv.model.Tor
+import de.hgv.model.Verein
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import java.net.URL
@@ -14,9 +22,10 @@ import java.time.format.DateTimeFormatter
 class SpielProvider {
 
     /**
-     * getSpiel parst die Daten zu einem Spiel
+     * getSpiel parst die Daten zu einem Spiel.
      * @param saison Jahr, in dem das Finale stattfindet (z.B. Saison 2017/2018 => 2018)
-     * @param phase Phase, in der das Spiel stattfindet (Gruppe A, ..., Gruppe F, Achtelfinale, Viertelfinale, Halbfinale, Finale)
+     * @param phase Phase, in der das Spiel stattfindet (Gruppe A, ..., Gruppe F, Achtelfinale, Viertelfinale,
+     * Halbfinale, Finale)
      * @param daheim Heimmannschaft
      * @param auswaerts Auswärtsmannschaft
      * @param detailed Falls true werden die Details des Spiels geparst (Aufstellungen, Torschützen)
@@ -25,12 +34,13 @@ class SpielProvider {
     fun getSpiel(saison: Int, phase: String, daheim: Verein, auswaerts: Verein, detailed: Boolean): Spiel? {
         val linkPhase = phase.replace(" ", "-").toLowerCase()
         val link =
-            "http://www.weltfussball.de/spielbericht/champions-league-${saison - 1}-$saison-$linkPhase-${daheim.id}-${auswaerts.id}"
+            "http://www.weltfussball.de/spielbericht/champions-league-${saison - 1}-$saison-$linkPhase-${daheim.id}" +
+                    "-${auswaerts.id}"
         return getSpiel(link, detailed)
     }
 
     /**
-     * getSpiel parst die Daten zu einem Spiel
+     * getSpiel parst die Daten zu einem Spiel.
      * @param link Letzter Teil des Links zur Spielübersicht
      * @param detailed Falls true werden die Details des Spiels geparst (Aufstellungen, Torschützen)
      * @return Das Spiel, oder null, wenn ein Fehler auftritt
@@ -41,28 +51,9 @@ class SpielProvider {
         val tabelle = doc.selectFirst(".box > .data > .standard_tabelle") ?: return null
         val rows = tabelle.select("tr")
 
-        val daheimName = rows.firstOrNull()?.selectFirst("th > a")?.text()
-        val daheimId = getId(rows, 0)
-        if (daheimName == null || daheimId == null) {
-            return null
-        }
-        val daheim = Verein(daheimName, daheimId)
+        val (daheim, auswaerts) = getVereine(rows) ?: return null
 
-        val auswaertsName = rows.firstOrNull()?.select("th > a")?.getOrNull(1)?.text()
-        val auswaertsId = getId(rows, 2)
-        if (auswaertsName == null || auswaertsId == null) {
-            return null
-        }
-        val auswaerts = Verein(auswaertsName, auswaertsId)
-
-        val dtf = DateTimeFormatter.ofPattern("d. MMMM yyyy")
-        val datumText =
-            rows.firstOrNull()
-                ?.selectFirst("th:eq(1)")
-                ?.html()
-                ?.substringBefore("<br>")
-                ?.substringAfter(", ")
-        val datum = datumText?.let { LocalDate.parse(it, dtf) } ?: return null
+        val datum = getDatum(rows) ?: return null
 
         var ergebnisString = rows.getOrNull(1)?.selectFirst("td > .resultat")?.text() ?: return null
         var verlaengerung = false
@@ -74,18 +65,12 @@ class SpielProvider {
             elfmeterschiessen = true
             ergebnisString = ergebnisString.removeSuffix("i.E.").trim()
         }
+
         val ergebnis = ergebnisString.split(":")
         val toreHeim = ergebnis[0].toIntOrNull() ?: return null
         val toreAuswaerts = ergebnis[1].toIntOrNull() ?: return null
 
-        // \u00BB = »
-        val phaseString =
-            doc.selectFirst("#navi > .breadcrumb > h1")
-                ?.text()
-                ?.substringAfter("\u00BB")
-                ?.substringBeforeLast("\u00BB")
-                ?.trim() ?: return null
-        val phase = Phase.getValue(phaseString)
+        val phase = getPhase(doc) ?: return null
 
         val spiel = Spiel(daheim, auswaerts, datum, toreHeim, toreAuswaerts, verlaengerung, elfmeterschiessen, phase)
 
@@ -97,14 +82,15 @@ class SpielProvider {
     }
 
     /**
-     * getDetailsForSpiel parst die Details zu einem Spiel (Aufstellungen, Torschützen)
+     * getDetailsForSpiel parst die Details zu einem Spiel (Aufstellungen, Torschützen).
      * @param spiel Spiel, dessen Details geparst werden sollen
      * @return Die Details, oder null, wenn ein Fehler auftritt
      */
     fun getDetailsForSpiel(spiel: Spiel): Spiel.Details? {
         val linkPhase = spiel.phase.toLink()
         val link =
-            "http://www.weltfussball.de/spielbericht/champions-league-${spiel.saison - 1}-${spiel.saison}-$linkPhase-${spiel.daheim.id}-${spiel.auswaerts.id}"
+            "http://www.weltfussball.de/spielbericht/champions-league-${spiel.saison - 1}-${spiel.saison}-$linkPhase" +
+                    "-${spiel.daheim.id}-${spiel.auswaerts.id}"
         val doc = Jsoup.parse(URL(link), 5000)
 
         val spielerHeimTabelle = doc.selectFirst(".box .data table td:eq(0) > table.standard_tabelle") ?: return null
@@ -164,8 +150,50 @@ class SpielProvider {
         )
     }
 
+    private fun getVereine(rows: Elements): Pair<Verein, Verein>? {
+        val daheimName = rows.firstOrNull()?.selectFirst("th > a")?.text()
+        val daheimId = getId(rows, 0)
+        if (daheimName == null || daheimId == null) {
+            return null
+        }
+        val daheim = Verein(daheimName, daheimId)
+
+        val auswaertsName = rows.firstOrNull()?.select("th > a")?.getOrNull(1)?.text()
+        val auswaertsId = getId(rows, 2)
+        if (auswaertsName == null || auswaertsId == null) {
+            return null
+        }
+        val auswaerts = Verein(auswaertsName, auswaertsId)
+
+        return daheim to auswaerts
+    }
+
+    private fun getDatum(rows: Elements): LocalDate? {
+        val dtf = DateTimeFormatter.ofPattern("d. MMMM yyyy")
+        val datumText =
+            rows.firstOrNull()
+                ?.selectFirst("th:eq(1)")
+                ?.html()
+                ?.substringBefore("<br>")
+                ?.substringAfter(", ")
+
+        return datumText?.let { LocalDate.parse(it, dtf) }
+    }
+
+    private fun getPhase(doc: Document): Phase? {
+        // \u00BB = »
+        val phaseString =
+            doc.selectFirst("#navi > .breadcrumb > h1")
+                ?.text()
+                ?.substringAfter("\u00BB")
+                ?.substringBeforeLast("\u00BB")
+                ?.trim() ?: return null
+
+        return Phase.getValue(phaseString)
+    }
+
     /**
-     * getId holt die ID eines Vereins
+     * getId holt die ID eines Vereins.
      * @param rows Zeilen der Tabelle mit den Vereinsnamen
      * @param index Index der Spalte, in der der Name des Vereins, dessen ID gesucht wird, steht
      * @return Die ID, oder null, wenn die ID nicht gefunden wird
@@ -177,7 +205,7 @@ class SpielProvider {
             ?.removeSurrounding("/teams/", "/")
 
     /**
-     * getAufstellung parst die Startelf
+     * getAufstellung parst die Startelf.
      * @param tabelle Tabelle, in der die Aufstellung des gesuchten Vereins steht
      */
     private fun getAufstellung(tabelle: Element): List<Spieler> {
@@ -194,7 +222,7 @@ class SpielProvider {
     }
 
     /**
-     * getAuswechslungen parst die Auswechslungen
+     * getAuswechslungen parst die Auswechslungen.
      * @param tabelle Tabelle, in der die Aufstellung des gesuchten Vereins steht
      * @return Liste aller Auswechslungen, aufsteigend sortiert nach Spielminute
      */
@@ -237,7 +265,7 @@ class SpielProvider {
     }
 
     /**
-     * getKarten parst die Karten aus der Aufstellungstabelle einer Mannschaft
+     * getKarten parst die Karten aus der Aufstellungstabelle einer Mannschaft.
      * @param tabelle Ausfstellung des gesuchten Vereins
      */
     private fun getKarten(tabelle: Element): List<Karte> {
@@ -265,5 +293,4 @@ class SpielProvider {
 
         return karten
     }
-
 }

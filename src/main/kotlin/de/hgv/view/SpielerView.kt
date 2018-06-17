@@ -11,11 +11,24 @@ import javafx.scene.layout.RowConstraints
 import javafx.scene.text.Font
 import javafx.scene.text.TextAlignment
 import kotlinx.coroutines.experimental.runBlocking
-import tornadofx.*
+import tornadofx.Fragment
+import tornadofx.ViewTransition
+import tornadofx.gridpane
+import tornadofx.gridpaneConstraints
+import tornadofx.imageview
+import tornadofx.label
+import tornadofx.millis
+import tornadofx.paddingLeft
+import tornadofx.runAsyncWithOverlay
+import tornadofx.runLater
+import tornadofx.tooltip
+import tornadofx.useMaxWidth
+import tornadofx.vbox
 import java.time.format.DateTimeFormatter
 
 /**
- * Stellt die Details zu einem Spieler dar. Die ID des Spielers wird über die params von TornadoFX übergeben mit dem Key "id". <br>
+ * Stellt die Details zu einem Spieler dar. Die ID des Spielers wird über die params von TornadoFX übergeben mit dem
+ * Key "id". <br>
  * TODO Statt params Konstruktor verwenden?
  *
  * @author Florian Gutekunst
@@ -25,11 +38,10 @@ class SpielerView: Fragment() {
     val id = params["id"] as? String ?: "joshua-kimmich"
     val spieler = ActiveProvider.getSpieler(id)
 
-
     override val root = vbox(alignment = Pos.TOP_CENTER) {
         vbox(alignment = Pos.TOP_CENTER) {
             runAsyncWithOverlay {
-                //Download der Wappen während ein Ladekreis angezeigt wird => Gibt eine Map von Verein zu Wappen zurück
+                // Download der Wappen während ein Ladekreis angezeigt wird => Gibt eine Map von Verein zu Wappen zurück
                 val urls = listOf(
                     spieler?.details?.verein?.wappenURL,
                     "http://www.nationalflaggen.de/media/flags/flagge-${spieler?.details?.land?.toLowerCase()}.gif",
@@ -39,7 +51,7 @@ class SpielerView: Fragment() {
                 runBlocking {
                     urls.map { download(it) }
                         .map { it.await() }
-                        //TODO NPE abfangen => Nicht-gefunden Bild anzeigen, wenn der InputStream null ist
+                        // TODO NPE abfangen => Nicht-gefunden Bild anzeigen, wenn der InputStream null ist
                         .map { Image(it) }
                 }
             } ui { bilder ->
@@ -119,7 +131,9 @@ class SpielerView: Fragment() {
 
                 // Liste der Eigenschaften eines Spielers als Paar von Eigenschatfsname und Wert
                 val eigenschaften = listOf(
-                    "Geburtstag: " to spieler?.details?.geburtstag?.format(DateTimeFormatter.ofPattern("dd. MMMM yyyy")),
+                    "Geburtstag: " to spieler?.details?.geburtstag?.format(
+                        DateTimeFormatter.ofPattern("dd. MMMM yyyy")
+                    ),
                     "Größe: " to spieler?.details?.groesse?.let { it.toString() + "cm" },
                     "Starker Fuß: " to spieler?.details?.spielfuss?.capitalize(),
                     "Position" + if (spieler?.details?.positionen?.size?.compareTo(2) ?: 0 >= 0) {
@@ -156,7 +170,6 @@ class SpielerView: Fragment() {
                             find<SpielerView>(mapOf("id" to name.replace(" ", "-").toLowerCase())),
                             ViewTransition.Fade(15.millis)
                         )
-
                     }
                 }
             }
