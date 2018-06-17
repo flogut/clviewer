@@ -39,13 +39,6 @@ jar:
     paths:
     - target/*-jar-with-dependencies.jar
 
-native:
-  stage: deploy
-  script: mvn jfx:native
-  artifacts:
-    paths:
-    - target/jfx/native/*.exe
-
 dokka:
   stage: deploy
   script: mvn dokka:dokka dokka:javadoc dokka:javadocJar
