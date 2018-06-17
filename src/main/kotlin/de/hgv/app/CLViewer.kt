@@ -7,7 +7,7 @@ import tornadofx.App
 /**
  * Hauptklasse der Anwendung clviewer.
  */
-class CLViewer: App(SpielerView::class)
+class CLViewer : App(SpielerView::class)
 
 /**
  * Main-Methode der Anwendung.

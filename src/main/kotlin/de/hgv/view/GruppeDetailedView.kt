@@ -36,7 +36,7 @@ import java.time.LocalDate
  *
  * @author Florian Gutekunst
  */
-class GruppeDetailedView: Fragment() {
+class GruppeDetailedView : Fragment() {
 
     /**
      * Wird keine Saison übergeben, wird die aktuelle Saison genutzt.

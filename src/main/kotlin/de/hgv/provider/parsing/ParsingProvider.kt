@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter
  *
  * @author Florian Gutekunst
  */
-open class ParsingProvider: Provider {
+open class ParsingProvider : Provider {
 
     private val spielerProvider = SpielerProvider()
     private val spielProvider = SpielProvider()

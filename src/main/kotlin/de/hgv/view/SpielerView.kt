@@ -33,7 +33,7 @@ import java.time.format.DateTimeFormatter
  *
  * @author Florian Gutekunst
  */
-class SpielerView: Fragment() {
+class SpielerView : Fragment() {
 
     val id = params["id"] as? String ?: "joshua-kimmich"
     val spieler = ActiveProvider.getSpieler(id)
