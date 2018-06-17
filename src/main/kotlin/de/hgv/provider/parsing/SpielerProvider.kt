@@ -7,6 +7,7 @@ import org.jsoup.select.Elements
 import java.net.URL
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 /**
  * @author Florian Gutekunst
@@ -26,7 +27,7 @@ class SpielerProvider {
         val tabelle = doc.selectFirst("table.standard_tabelle.yellow") ?: return null
         val rows = tabelle.select("tr")
 
-        val dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+        val dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.GERMANY)
         val geburtstag =
             getTextFromTable(rows, "geboren am:")?.let { LocalDate.parse(it, dateTimeFormatter) }
 

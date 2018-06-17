@@ -11,6 +11,7 @@ import org.jsoup.nodes.Element
 import java.net.URL
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 /**
  * Der ParsingProvider lädt die benötigten Daten von einer Website herunter und parst sie dann.
@@ -53,7 +54,7 @@ open class ParsingProvider : Provider {
                 continue
             }
 
-            val dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+            val dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.GERMANY)
             val datum = row.selectFirst("td:eq(0) > a")?.text()?.let { LocalDate.parse(it, dtf) } ?: letztesDatum
             letztesDatum = datum
 

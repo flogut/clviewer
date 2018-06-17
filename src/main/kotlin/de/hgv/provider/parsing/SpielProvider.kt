@@ -15,6 +15,7 @@ import org.jsoup.select.Elements
 import java.net.URL
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 /**
  * @author Florian Gutekunst
@@ -169,7 +170,7 @@ class SpielProvider {
     }
 
     private fun getDatum(rows: Elements): LocalDate? {
-        val dtf = DateTimeFormatter.ofPattern("d. MMMM yyyy")
+        val dtf = DateTimeFormatter.ofPattern("d. MMMM yyyy", Locale.GERMANY)
         val datumText =
             rows.firstOrNull()
                 ?.selectFirst("th:eq(1)")
