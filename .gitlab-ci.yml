@@ -8,7 +8,7 @@ build:
   script: mvn clean validate compile
   artifacts:
     paths:
-	- detekt/
+    - detekt/
 	expire_in: 1 week
   
 test:
@@ -20,7 +20,7 @@ jar:
   script: mvn package
   artifacts:
     paths:
-	- target/*-jar-with-dependencies.jar
+    - target/*-jar-with-dependencies.jar
 	expire_in: 1 week
   
 native:
@@ -28,5 +28,5 @@ native:
   script: mvn jfx:native
   artifacts:
     paths:
-	- target/jfx/native/*.exe
-	expire_in: 1 week
+    - target/jfx/native/*.exe
+    expire_in: 1 week
