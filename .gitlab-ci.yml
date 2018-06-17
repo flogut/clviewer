@@ -14,6 +14,7 @@ before_script:
 cache:
   paths:
     - .m2/repository
+    - target/
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
@@ -28,7 +29,7 @@ build:
   artifacts:
     paths:
     - detekt/
-    expire_in: 1 week
+    expire_in: 1 day
     when: always
 
 jar:
@@ -37,8 +38,6 @@ jar:
   artifacts:
     paths:
     - target/*-jar-with-dependencies.jar
-    expire_in: 1 week
-  when: manual
 
 native:
   stage: deploy
@@ -46,5 +45,12 @@ native:
   artifacts:
     paths:
     - target/jfx/native/*.exe
-    expire_in: 1 week
-  when: manual
+
+dokka:
+  stage: deploy
+  script: mvn dokka:dokka dokka:javadoc dokka:javadocJar
+  artifacts:
+      paths:
+      - target/dokka/
+      - target/dokkaJavadoc/
+      - target/*-javadoc.jar
