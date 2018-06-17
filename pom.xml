@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.example</groupId>
+    <groupId>de.hgv</groupId>
     <artifactId>clviewer</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
@@ -13,6 +13,7 @@
         <kotlin.version>1.2.40</kotlin.version>
         <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
         <main.class>de.hgv.app.CLViewerKt</main.class>
+        <detekt.config>detekt-config.yml</detekt.config>
     </properties>
 
     <pluginRepositories>
@@ -20,6 +21,22 @@
             <id>jcenter</id>
             <name>JCenter</name>
             <url>https://jcenter.bintray.com/</url>
+        </pluginRepository>
+        <pluginRepository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>bintray-ozsie-maven</id>
+            <name>bintray-plugins</name>
+            <url>https://dl.bintray.com/ozsie/maven</url>
+        </pluginRepository>
+        <pluginRepository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>bintray-gantsign-maven</id>
+            <name>bintray</name>
+            <url>https://dl.bintray.com/gantsign/maven</url>
         </pluginRepository>
     </pluginRepositories>
 
@@ -180,8 +197,33 @@
                     <jfxMainAppJarName>clviewer.jar</jfxMainAppJarName>
                     <vendor>Humboldt-Gymnasium Vaterstetten</vendor>
                     <appName>clviewer</appName>
-                    <verbose>true</verbose>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.github.gantsign.maven</groupId>
+                <artifactId>ktlint-maven-plugin</artifactId>
+                <version>0.9.4</version>
+                <executions>
+                    <execution>
+                        <id>format-and-check</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>format</goal>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.ozsie</groupId>
+                <artifactId>detekt-maven-plugin</artifactId>
+                <version>1.0.0.RC6-4</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals><goal>check</goal></goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
