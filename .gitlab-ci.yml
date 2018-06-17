@@ -11,6 +11,13 @@ before_script:
   - apt-get clean
   - rm -f /var/lib/apt/lists/*_dists_*
 
+cache:
+  paths:
+    - .m2/repository
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+
 test:
   stage: test
   script: mvn test
