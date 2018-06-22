@@ -4,14 +4,27 @@ import de.hgv.model.Phase
 import de.hgv.provider.ActiveProvider
 import javafx.geometry.Pos
 import javafx.scene.control.TextInputDialog
-import javafx.scene.image.Image
 import javafx.scene.input.KeyCode
 import javafx.scene.layout.Priority
 import javafx.scene.text.Font
 import javafx.scene.text.FontWeight
 import javafx.scene.text.TextAlignment
-import kotlinx.coroutines.experimental.runBlocking
-import tornadofx.*
+import tornadofx.Fragment
+import tornadofx.ViewTransition
+import tornadofx.gridpane
+import tornadofx.gridpaneConstraints
+import tornadofx.imageview
+import tornadofx.label
+import tornadofx.paddingLeft
+import tornadofx.paddingRight
+import tornadofx.row
+import tornadofx.runAsyncWithOverlay
+import tornadofx.runLater
+import tornadofx.seconds
+import tornadofx.useMaxSize
+import tornadofx.useMaxWidth
+import tornadofx.vbox
+import tornadofx.vgrow
 import java.time.LocalDate
 
 /**
@@ -48,15 +61,7 @@ class GruppeDetailedView : Fragment() {
 
             runAsyncWithOverlay {
                 // Download der Wappen während ein Ladekreis angezeigt wird => Gibt eine Map von Verein zu Wappen zurück
-                runBlocking {
-                    tabelle?.tabelle
-                        ?.map { it.verein }
-                        ?.map { it to download(it.wappenURL) }
-                        ?.map { (verein, job) -> verein to job.await() }
-                        // TODO NPE abfangen => Nicht-gefunden Bild anzeigen, wenn der InputStream null ist
-                        ?.map { (verein, inputStream) -> verein to Image(inputStream) }
-                        ?.toMap() ?: mapOf()
-                }
+                Download.downloadWappen(tabelle?.tabelle?.map { it.verein }.orEmpty())
             } ui { wappen ->
                 // Überschrift Tabelle
                 label("Tabelle") {

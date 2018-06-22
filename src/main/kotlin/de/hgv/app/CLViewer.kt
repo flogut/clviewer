@@ -2,7 +2,7 @@ package de.hgv.app
 
 import de.hgv.view.TurnierbaumView
 import javafx.application.Application
-import tornadofx.*
+import tornadofx.App
 
 /**
  * Hauptklasse der Anwendung clviewer.

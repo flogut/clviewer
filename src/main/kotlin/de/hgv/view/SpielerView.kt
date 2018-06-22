@@ -43,17 +43,21 @@ class SpielerView : Fragment() {
             runAsyncWithOverlay {
                 // Download der Wappen während ein Ladekreis angezeigt wird => Gibt eine Map von Verein zu Wappen zurück
                 val urls = listOf(
-                    spieler?.details?.verein?.wappenURL,
                     "http://www.nationalflaggen.de/media/flags/flagge-${spieler?.details?.land?.toLowerCase()}.gif",
                     spieler?.details?.portraitUrl
                 )
 
-                runBlocking {
-                    urls.map { download(it) }
+                val bilder = runBlocking {
+                    urls.map { Download.downloadAsync(it) }
                         .map { it.await() }
                         // TODO NPE abfangen => Nicht-gefunden Bild anzeigen, wenn der InputStream null ist
                         .map { Image(it) }
+                        .toMutableList()
                 }
+
+                bilder.add(0, Download.downloadWappen(spieler?.details?.verein))
+
+                bilder
             } ui { bilder ->
                 gridpane {
                     alignment = Pos.TOP_CENTER

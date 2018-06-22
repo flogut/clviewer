@@ -1,13 +1,13 @@
 package de.hgv.model
 
 import de.hgv.provider.ActiveProvider
-import tornadofx.*
+import tornadofx.swap
 import kotlin.collections.set
 
 /**
  * @author Tobias Döttling, Florian Gutekunst
  */
-class KoSpiele(val saison:Int) {
+class KoSpiele(val saison: Int) {
 
     private val alleSpiele = ActiveProvider.getSpiele(saison).groupBy { it.phase }
     private val turnierbaum = mutableMapOf<Phase, List<List<Spiel>>>()
@@ -23,7 +23,7 @@ class KoSpiele(val saison:Int) {
         return turnierbaum
     }
 
-    //rekursive Methode, die eine MutableList des Tunierbaums zurückgibt
+    // rekursive Methode, die eine MutableList des Tunierbaums zurückgibt
     private fun getTurnierbaum(phase: Phase?, letztePhase: MutableList<List<Spiel>>): MutableList<List<Spiel>> {
 
         if (phase == null) {
@@ -32,7 +32,7 @@ class KoSpiele(val saison:Int) {
 
         val spiele = alleSpiele[phase] ?: return letztePhase
 
-        //Spiele in Paarungen aufteilen
+        // Spiele in Paarungen aufteilen
         var paarungen = mutableListOf<List<Spiel>>()
         for (spiel in spiele) {
             if (paarungen.any { spiel in it }) {
@@ -44,11 +44,11 @@ class KoSpiele(val saison:Int) {
         }
 
         if (paarungen.isNotEmpty()) {
-            //rekursiver Aufruf:
+            // rekursiver Aufruf:
             paarungen = getTurnierbaum(phase.naechste(), paarungen)
         }
 
-        //Vertauschen der Spiele, damit die Spiele in der korrekten Reihenfolge angezeigt werden
+        // Vertauschen der Spiele, damit die Spiele in der korrekten Reihenfolge angezeigt werden
         if (letztePhase.isNotEmpty()) {
             paarungen.forEachIndexed { index, paarung ->
                 val vereine = paarung[0].daheim to paarung[0].auswaerts

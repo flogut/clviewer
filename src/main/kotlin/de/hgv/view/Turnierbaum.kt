@@ -7,10 +7,16 @@ import de.hgv.model.Verein
 import javafx.geometry.Pos
 import javafx.scene.image.Image
 import javafx.scene.layout.GridPane
-import tornadofx.*
+import tornadofx.gridpane
+import tornadofx.gridpaneConstraints
+import tornadofx.imageview
+import tornadofx.label
+import tornadofx.row
+import tornadofx.tooltip
+import tornadofx.vbox
 
 /**
- * Baut das UI des Turnierbaums
+ * Baut das UI des Turnierbaums.
  * @param saison Saison, deren Verlauf dargestellt werden soll
  */
 fun buildTurnierbaum(saison: Int) = GridPane().apply {
@@ -18,10 +24,10 @@ fun buildTurnierbaum(saison: Int) = GridPane().apply {
 
     val turnier = KoSpiele(saison).getTurnierbaum()
     val vereine = turnier[Phase.ACHTELFINALE].orEmpty().flatMap { it.map { it.daheim } }.distinct()
-    val wappen = downloadWappen(vereine)
+    val wappen = Download.downloadWappen(vereine)
 
-    //Achtelfinalspiele:
-    for (i: Int in (0..7)) {
+    // Achtelfinalspiele:
+    for (i: Int in 0..7) {
         vbox {
             gridpane {
                 hgap = 10.0
@@ -31,13 +37,13 @@ fun buildTurnierbaum(saison: Int) = GridPane().apply {
                 buildSpiel(paarung, 1, wappen)
             }
             gridpaneConstraints {
-                columnRowIndex((i / 4) * 6, 2 * (i % 4))
+                columnRowIndex(i / 4 * 6, 2 * (i % 4))
             }
         }
     }
 
-    //Viertelfinalspiele
-    for (i: Int in (0..3)) {
+    // Viertelfinalspiele
+    for (i: Int in 0..3) {
         vbox {
             gridpane {
                 hgap = 10.0
@@ -52,8 +58,8 @@ fun buildTurnierbaum(saison: Int) = GridPane().apply {
         }
     }
 
-    //Halbfinalspiele
-    for (i: Int in (0..1)) {
+    // Halbfinalspiele
+    for (i: Int in 0..1) {
         vbox {
             gridpane {
                 hgap = 10.0
@@ -68,7 +74,7 @@ fun buildTurnierbaum(saison: Int) = GridPane().apply {
         }
     }
 
-    //Finalspiel
+    // Finalspiel
     vbox {
         gridpane {
             hgap = 10.0
@@ -89,7 +95,7 @@ fun buildTurnierbaum(saison: Int) = GridPane().apply {
  * @param index Index des Spiels
  * @param wappen Wappen der Vereine, die in den KO-Spielen vertreten sind
  */
-private fun GridPane.buildSpiel(paarung: List<Spiel>?, index: Int, wappen: Map<Verein?, Image>) = row {
+private fun GridPane.buildSpiel(paarung: List<Spiel>?, index: Int, wappen: Map<Verein, Image>) = row {
     val daheim = paarung?.get(index)?.daheim ?: Verein.UNBEKANNT
     val auswaerts = paarung?.get(index)?.auswaerts ?: Verein.UNBEKANNT
 
@@ -115,4 +121,3 @@ private fun GridPane.buildSpiel(paarung: List<Spiel>?, index: Int, wappen: Map<V
         tooltip(auswaerts.name)
     }
 }
-
