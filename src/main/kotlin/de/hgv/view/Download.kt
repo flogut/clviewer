@@ -1,7 +1,10 @@
 package de.hgv.view
 
+import de.hgv.model.Verein
+import javafx.scene.image.Image
 import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.runBlocking
 import java.io.InputStream
 import java.net.MalformedURLException
 import java.net.URL
@@ -27,4 +30,22 @@ fun download(url: String?): Deferred<InputStream?> = async {
     } catch (e: MalformedURLException) {
         null
     }
+}
+
+/**
+ * Lädt die Wappen der Vereine herunter.
+ * @param vereine Liste der Vereine, deren Wappen heruntergeladen werden sollen
+ *
+ * @author Florian Gutekunst
+ */
+fun downloadWappen(vereine: List<Verein?>): Map<Verein?, Image> = runBlocking {
+    //TODO Bei unbekanntem Verein kein Wappen downloaden, sondern ein eigenes Bild zurückgeben
+
+    vereine
+        .distinct()
+        .map { verein -> verein to download(verein?.wappenURL) }
+        .map { (verein, job) -> verein to job.await() }
+        //TODO NPE abfangen => Nicht-gefunden Bild anzeigen, wenn der InputStream null ist
+        .map { (verein, inputStream) -> verein to Image(inputStream) }
+        .toMap()
 }

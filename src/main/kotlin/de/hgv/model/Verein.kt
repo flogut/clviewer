@@ -16,4 +16,11 @@ data class Verein(val name: String, val id: String) {
         val doc = Jsoup.parse(URL("http://weltfussball.de/teams/$id"), 5000)
         doc.selectFirst("div.emblem > a > img")?.attr("src")
     }
+
+    companion object {
+        /**
+         * Objekt das verwendet wird, wenn der Verein unbekannt ist.
+         */
+        val UNBEKANNT = Verein("Unbekannt", "unbekannt")
+    }
 }

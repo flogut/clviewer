@@ -11,22 +11,7 @@ import javafx.scene.text.Font
 import javafx.scene.text.FontWeight
 import javafx.scene.text.TextAlignment
 import kotlinx.coroutines.experimental.runBlocking
-import tornadofx.Fragment
-import tornadofx.ViewTransition
-import tornadofx.gridpane
-import tornadofx.gridpaneConstraints
-import tornadofx.imageview
-import tornadofx.label
-import tornadofx.paddingLeft
-import tornadofx.paddingRight
-import tornadofx.row
-import tornadofx.runAsyncWithOverlay
-import tornadofx.runLater
-import tornadofx.seconds
-import tornadofx.useMaxSize
-import tornadofx.useMaxWidth
-import tornadofx.vbox
-import tornadofx.vgrow
+import tornadofx.*
 import java.time.LocalDate
 
 /**
@@ -50,8 +35,8 @@ class GruppeDetailedView : Fragment() {
     }
 
     val phase = params["phase"] as? Phase ?: Phase.GRUPPE_A
-    val tabelle = ActiveProvider.getTabelle(phase.toString(), saison)
-    val spiele = ActiveProvider.getSpieleInPhase(phase, saison).sortedBy { it.datum }
+    private val tabelle = ActiveProvider.getTabelle(phase.toString(), saison)
+    private val spiele = ActiveProvider.getSpieleInPhase(phase, saison).sortedBy { it.datum }
 
     override val root = vbox {
         useMaxSize = true

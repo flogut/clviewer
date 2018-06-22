@@ -22,6 +22,27 @@ enum class Phase {
             .split("_")
             .joinToString(" ") { it.capitalize() }
 
+    /**
+     * Prüft, ob diese Phase vor der als Parameter übergebenen Phase stattfindet.
+     */
+    fun bevor(phase: Phase): Boolean = if (this.ordinal < 7 && phase.ordinal < 7) {
+        false
+    } else {
+        this.ordinal < phase.ordinal
+    }
+
+    /**
+     * Gibt die Phase zurück, die zeitlich als nächstes Stattfindet.
+     * @return Die nächste Phase, oder null wenn die aktuelle Phase das Finale ist
+     */
+    fun naechste(): Phase? = when (this) {
+        ACHTELFINALE -> VIERTELFINALE
+        VIERTELFINALE -> HALBFINALE
+        HALBFINALE -> FINALE
+        FINALE -> null
+        else -> ACHTELFINALE
+    }
+
     companion object {
 
         /**
