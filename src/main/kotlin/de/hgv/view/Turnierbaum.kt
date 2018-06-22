@@ -9,6 +9,10 @@ import javafx.scene.image.Image
 import javafx.scene.layout.GridPane
 import tornadofx.*
 
+/**
+ * Baut das UI des Turnierbaums
+ * @param saison Saison, deren Verlauf dargestellt werden soll
+ */
 fun buildTurnierbaum(saison: Int) = GridPane().apply {
     hgap = 20.0
 
@@ -32,54 +36,15 @@ fun buildTurnierbaum(saison: Int) = GridPane().apply {
         }
     }
 
-
     //Viertelfinalspiele
     for (i: Int in (0..3)) {
         vbox {
             gridpane {
                 hgap = 10.0
-                row {
-                    imageview(wappen.getValue(turnier.get(Phase.VIERTELFINALE)?.get(i)?.get(0)?.daheim)) {
-                        fitWidth = 50.0
-                        isPreserveRatio = true
-                        isSmooth = true
-                    }
+                val paarung = turnier[Phase.VIERTELFINALE]?.get(i)
 
-                    label(turnier.get(Phase.VIERTELFINALE)?.get(i)?.get(0)?.toreHeim.toString())
-
-                    label(":")
-
-                    label(turnier.get(Phase.VIERTELFINALE)?.get(i)?.get(0)?.toreAuswaerts.toString())
-
-                    imageview(wappen.getValue(turnier.get(Phase.VIERTELFINALE)?.get(i)?.get(0)?.auswaerts)) {
-                        fitWidth = 50.0
-                        isPreserveRatio = true
-                        isSmooth = true
-                    }
-
-
-                }
-                row {
-                    imageview(wappen.getValue(turnier.get(Phase.VIERTELFINALE)?.get(i)?.get(1)?.daheim)) {
-                        fitWidth = 50.0
-                        isPreserveRatio = true
-                        isSmooth = true
-                    }
-
-                    label(turnier.get(Phase.VIERTELFINALE)?.get(i)?.get(1)?.toreHeim.toString())
-
-                    label(":")
-
-                    label(turnier.get(Phase.VIERTELFINALE)?.get(i)?.get(1)?.toreAuswaerts.toString())
-
-                    imageview(wappen.getValue(turnier.get(Phase.VIERTELFINALE)?.get(i)?.get(1)?.auswaerts)) {
-                        fitWidth = 50.0
-                        isPreserveRatio = true
-                        isSmooth = true
-                    }
-
-
-                }
+                buildSpiel(paarung, 0, wappen)
+                buildSpiel(paarung, 1, wappen)
             }
             gridpaneConstraints {
                 columnRowIndex(4 * (i / 2) + 1, 4 * (i % 2) + 1)
@@ -92,48 +57,10 @@ fun buildTurnierbaum(saison: Int) = GridPane().apply {
         vbox {
             gridpane {
                 hgap = 10.0
-                row {
-                    imageview(wappen.getValue(turnier.get(Phase.HALBFINALE)?.get(i)?.get(0)?.daheim)) {
-                        fitWidth = 50.0
-                        isPreserveRatio = true
-                        isSmooth = true
-                    }
+                val paarung = turnier[Phase.HALBFINALE]?.get(i)
 
-                    label(turnier.get(Phase.HALBFINALE)?.get(i)?.get(0)?.toreHeim.toString())
-
-                    label(":")
-
-                    label(turnier.get(Phase.HALBFINALE)?.get(i)?.get(0)?.toreAuswaerts.toString())
-
-                    imageview(wappen.getValue(turnier.get(Phase.HALBFINALE)?.get(i)?.get(0)?.auswaerts)) {
-                        fitWidth = 50.0
-                        isPreserveRatio = true
-                        isSmooth = true
-                    }
-
-
-                }
-                row {
-                    imageview(wappen.getValue(turnier.get(Phase.HALBFINALE)?.get(i)?.get(1)?.daheim)) {
-                        fitWidth = 50.0
-                        isPreserveRatio = true
-                        isSmooth = true
-                    }
-
-                    label(turnier.get(Phase.HALBFINALE)?.get(i)?.get(1)?.toreHeim.toString())
-
-                    label(":")
-
-                    label(turnier.get(Phase.HALBFINALE)?.get(i)?.get(1)?.toreAuswaerts.toString())
-
-                    imageview(wappen.getValue(turnier.get(Phase.HALBFINALE)?.get(i)?.get(1)?.auswaerts)) {
-                        fitWidth = 50.0
-                        isPreserveRatio = true
-                        isSmooth = true
-                    }
-
-
-                }
+                buildSpiel(paarung, 0, wappen)
+                buildSpiel(paarung, 1, wappen)
             }
             gridpaneConstraints {
                 columnRowIndex((i + 1) * 2, 3)
@@ -145,25 +72,7 @@ fun buildTurnierbaum(saison: Int) = GridPane().apply {
     vbox {
         gridpane {
             hgap = 10.0
-            row {
-                imageview(wappen.getValue(turnier.get(Phase.FINALE)?.get(0)?.get(0)?.daheim)) {
-                    fitWidth = 50.0
-                    isPreserveRatio = true
-                    isSmooth = true
-                }
-
-                label(turnier.get(Phase.FINALE)?.get(0)?.get(0)?.toreHeim.toString())
-
-                label(":")
-
-                label(turnier.get(Phase.FINALE)?.get(0)?.get(0)?.toreAuswaerts.toString())
-
-                imageview(wappen.getValue(turnier.get(Phase.FINALE)?.get(0)?.get(0)?.auswaerts)) {
-                    fitWidth = 50.0
-                    isPreserveRatio = true
-                    isSmooth = true
-                }
-            }
+            buildSpiel(turnier[Phase.FINALE]?.get(0), 0, wappen)
         }
         gridpaneConstraints {
             columnRowIndex(3, 3)
@@ -174,6 +83,12 @@ fun buildTurnierbaum(saison: Int) = GridPane().apply {
     return@apply
 }
 
+/**
+ * Baut die Darstellung eines Spiels.
+ * @param paarung Paarung, in der das Spiel ist
+ * @param index Index des Spiels
+ * @param wappen Wappen der Vereine, die in den KO-Spielen vertreten sind
+ */
 private fun GridPane.buildSpiel(paarung: List<Spiel>?, index: Int, wappen: Map<Verein?, Image>) = row {
     val daheim = paarung?.get(index)?.daheim ?: Verein.UNBEKANNT
     val auswaerts = paarung?.get(index)?.auswaerts ?: Verein.UNBEKANNT
@@ -196,6 +111,8 @@ private fun GridPane.buildSpiel(paarung: List<Spiel>?, index: Int, wappen: Map<V
         fitWidth = 50.0
         isPreserveRatio = true
         isSmooth = true
+
+        tooltip(auswaerts.name)
     }
 }
 

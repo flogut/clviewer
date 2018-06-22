@@ -1,13 +1,13 @@
 package de.hgv.app
 
-import de.hgv.view.SpielerView
+import de.hgv.view.TurnierbaumView
 import javafx.application.Application
-import tornadofx.App
+import tornadofx.*
 
 /**
  * Hauptklasse der Anwendung clviewer.
  */
-class CLViewer : App(SpielerView::class)
+class CLViewer : App(TurnierbaumView::class)
 
 /**
  * Main-Methode der Anwendung.
