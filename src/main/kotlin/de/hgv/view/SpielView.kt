@@ -141,6 +141,12 @@ class SpielView : Fragment() {
             for (spieler in startelf) {
                 hbox(alignment = Pos.CENTER_LEFT, spacing = 5.0) {
                     hgrow = Priority.ALWAYS
+                    setOnMouseClicked {
+                        val view = tornadofx.find<SpielerView>(params = mapOf("spieler" to spieler))
+                        val stage = view.openWindow(resizable = false)
+                        view.stage = stage
+                    }
+
 
                     label(spieler.name.trim()) {
                         font = Font.font(fontSize)
@@ -199,6 +205,11 @@ class SpielView : Fragment() {
             for (auswechslung in auswechslungen) {
                 hbox(alignment = Pos.CENTER_LEFT, spacing = 5.0) {
                     hgrow = Priority.ALWAYS
+                    setOnMouseClicked {
+                        val view = tornadofx.find<SpielerView>(params = mapOf("spieler" to auswechslung.ein))
+                        val stage = view.openWindow(resizable = false)
+                        view.stage = stage
+                    }
 
                     label(auswechslung.ein.name.trim()) {
                         font = Font.font(fontSize)
@@ -254,6 +265,12 @@ class SpielView : Fragment() {
         op?.invoke(liste)
 
         return liste
+    }
+
+    init {
+        if (spiel != null) {
+            title = "${spiel.daheim.name} ${spiel.toreHeim} : ${spiel.toreAuswaerts} ${spiel.auswaerts.name}"
+        }
     }
 
     private enum class Team {

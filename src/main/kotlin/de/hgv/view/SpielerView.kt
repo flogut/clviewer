@@ -1,23 +1,20 @@
 package de.hgv.view
 
-import de.hgv.provider.ActiveProvider
+import de.hgv.model.Spieler
 import javafx.geometry.HPos
 import javafx.geometry.Pos
 import javafx.geometry.VPos
-import javafx.scene.control.TextInputDialog
 import javafx.scene.image.Image
-import javafx.scene.input.KeyCode
 import javafx.scene.layout.RowConstraints
 import javafx.scene.text.Font
 import javafx.scene.text.TextAlignment
+import javafx.stage.Stage
 import kotlinx.coroutines.experimental.runBlocking
 import tornadofx.Fragment
-import tornadofx.ViewTransition
 import tornadofx.gridpane
 import tornadofx.gridpaneConstraints
 import tornadofx.imageview
 import tornadofx.label
-import tornadofx.millis
 import tornadofx.paddingLeft
 import tornadofx.runAsyncWithOverlay
 import tornadofx.runLater
@@ -27,24 +24,24 @@ import tornadofx.vbox
 import java.time.format.DateTimeFormatter
 
 /**
- * Stellt die Details zu einem Spieler dar. Die ID des Spielers wird über die params von TornadoFX übergeben mit dem
- * Key "id". <br>
+ * Stellt die Details zu einem Spieler dar. Der Spielers wird über die params von TornadoFX übergeben mit dem
+ * Key "spieler". <br>
  * TODO Statt params Konstruktor verwenden?
  *
  * @author Florian Gutekunst
  */
 class SpielerView : Fragment() {
 
-    val id = params["id"] as? String ?: "joshua-kimmich"
-    val spieler = ActiveProvider.getSpieler(id)
+    val spieler = params["spieler"] as Spieler
+    var stage: Stage? = null
 
     override val root = vbox(alignment = Pos.TOP_CENTER) {
         vbox(alignment = Pos.TOP_CENTER) {
             runAsyncWithOverlay {
                 // Download der Wappen während ein Ladekreis angezeigt wird => Gibt eine Map von Verein zu Wappen zurück
                 val urls = listOf(
-                    "http://www.nationalflaggen.de/media/flags/flagge-${spieler?.details?.land?.toLowerCase()}.gif",
-                    spieler?.details?.portraitUrl
+                    "http://www.nationalflaggen.de/media/flags/flagge-${spieler.details?.land?.toLowerCase()}.gif",
+                    spieler.details?.portraitUrl
                 )
 
                 val bilder = runBlocking {
@@ -55,7 +52,7 @@ class SpielerView : Fragment() {
                         .toMutableList()
                 }
 
-                bilder.add(0, Download.downloadWappen(spieler?.details?.verein))
+                bilder.add(0, Download.downloadWappen(spieler.details?.verein))
 
                 bilder
             } ui { bilder ->
@@ -70,7 +67,7 @@ class SpielerView : Fragment() {
                         isSmooth = true
                         alignment = Pos.CENTER
 
-                        tooltip(spieler?.details?.verein?.name)
+                        tooltip(spieler.details?.verein?.name)
 
                         gridpaneConstraints {
                             columnRowIndex(0, 0)
@@ -86,7 +83,7 @@ class SpielerView : Fragment() {
                         isPreserveRatio = true
                         isSmooth = true
 
-                        tooltip(spieler?.details?.land)
+                        tooltip(spieler.details?.land)
 
                         gridpaneConstraints {
                             columnRowIndex(0, 1)
@@ -96,7 +93,7 @@ class SpielerView : Fragment() {
                     }
 
                     // Rückennummer
-                    label("#${spieler?.details?.nummer}") {
+                    label("#${spieler.details?.nummer}") {
                         font = Font(50.0)
                         textAlignment = TextAlignment.CENTER
 
@@ -126,7 +123,7 @@ class SpielerView : Fragment() {
                 }
 
                 // Name
-                label(spieler?.name.orEmpty()) {
+                label(spieler.name) {
                     font = Font(30.0)
                     textAlignment = TextAlignment.CENTER
                     useMaxWidth = true
@@ -135,16 +132,16 @@ class SpielerView : Fragment() {
 
                 // Liste der Eigenschaften eines Spielers als Paar von Eigenschatfsname und Wert
                 val eigenschaften = listOf(
-                    "Geburtstag: " to spieler?.details?.geburtstag?.format(
+                    "Geburtstag: " to spieler.details?.geburtstag?.format(
                         DateTimeFormatter.ofPattern("dd. MMMM yyyy")
                     ),
-                    "Größe: " to spieler?.details?.groesse?.let { it.toString() + "cm" },
-                    "Starker Fuß: " to spieler?.details?.spielfuss?.capitalize(),
-                    "Position" + if (spieler?.details?.positionen?.size?.compareTo(2) ?: 0 >= 0) {
+                    "Größe: " to spieler.details?.groesse?.let { it.toString() + "cm" },
+                    "Starker Fuß: " to spieler.details?.spielfuss?.capitalize(),
+                    "Position" + if (spieler.details?.positionen?.size?.compareTo(2) ?: 0 >= 0) {
                         "en"
                     } else {
                         ""
-                    } + ": " to spieler?.details?.positionen?.joinToString(", ")
+                    } + ": " to spieler.details?.positionen?.joinToString(", ")
                 )
 
                 // Zeigt die Eigenschaften an, deren Wert bekannt ist
@@ -156,37 +153,19 @@ class SpielerView : Fragment() {
                     }
                 }
 
-                primaryStage.sizeToScene()
-                primaryStage.centerOnScreen()
-            }
-
-            // TODO Entfernen (Nur für Navigation während des Debuggings)
-            setOnKeyPressed {
-                if (it.isControlDown && it.code == KeyCode.F) {
-                    it.consume()
-                    val dialog = TextInputDialog()
-                    dialog.headerText = "Spieler auswählen"
-                    dialog.title = "Spieler auswählen"
-
-                    val result = dialog.showAndWait()
-                    result.ifPresent { name ->
-                        this@SpielerView.replaceWith(
-                            find<SpielerView>(mapOf("id" to name.replace(" ", "-").toLowerCase())),
-                            ViewTransition.Fade(15.millis)
-                        )
-                    }
+                runLater {
+                    resize()
                 }
-            }
-
-            runLater {
-                requestFocus()
             }
         }
     }
 
-    init {
-        primaryStage.isResizable = false
+    private fun resize() {
+        stage?.sizeToScene()
+        stage?.centerOnScreen()
+    }
 
-        title = spieler?.name.orEmpty()
+    init {
+        title = spieler.name
     }
 }
