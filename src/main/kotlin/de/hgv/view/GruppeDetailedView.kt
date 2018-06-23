@@ -3,14 +3,12 @@ package de.hgv.view
 import de.hgv.model.Phase
 import de.hgv.provider.ActiveProvider
 import javafx.geometry.Pos
-import javafx.scene.control.TextInputDialog
-import javafx.scene.input.KeyCode
 import javafx.scene.layout.Priority
 import javafx.scene.text.Font
 import javafx.scene.text.FontWeight
 import javafx.scene.text.TextAlignment
+import javafx.stage.Stage
 import tornadofx.Fragment
-import tornadofx.ViewTransition
 import tornadofx.gridpane
 import tornadofx.gridpaneConstraints
 import tornadofx.imageview
@@ -20,7 +18,6 @@ import tornadofx.paddingRight
 import tornadofx.row
 import tornadofx.runAsyncWithOverlay
 import tornadofx.runLater
-import tornadofx.seconds
 import tornadofx.useMaxSize
 import tornadofx.useMaxWidth
 import tornadofx.vbox
@@ -50,6 +47,8 @@ class GruppeDetailedView : Fragment() {
     val phase = params["phase"] as? Phase ?: Phase.GRUPPE_A
     private val tabelle = ActiveProvider.getTabelle(phase.toString(), saison)
     private val spiele = ActiveProvider.getSpieleInPhase(phase, saison).sortedBy { it.datum }
+
+    var stage: Stage? = null
 
     override val root = vbox {
         useMaxSize = true
@@ -127,7 +126,7 @@ class GruppeDetailedView : Fragment() {
                     font = Font.font(font.family, FontWeight.BOLD, 30.0)
                 }
 
-                // Für eine schöne Anordnung, werden die Spiele wie eine Tabelle dargestellt
+                // Für eine schöne Anordnung werden die Spiele wie eine Tabelle dargestellt
                 gridpane {
                     hgap = 10.0
                     vgap = 3.0
@@ -173,52 +172,20 @@ class GruppeDetailedView : Fragment() {
                         }
                     }
                 }
-            }
-        }
 
-        // TODO Entfernen (Nur für Navigation während des Debuggings)
-        setOnKeyPressed {
-            if (it.isControlDown && it.code == KeyCode.F) {
-                it.consume()
-
-                val dialog = TextInputDialog()
-                dialog.headerText = "Gruppe auswählen"
-                dialog.title = "Gruppe auswählen"
-
-                val result = dialog.showAndWait()
-                result.ifPresent {
-                    val phase = Phase.getValue(it)
-                    this@GruppeDetailedView.replaceWith(
-                        find<GruppeDetailedView>(mapOf("phase" to phase, "saison" to saison)),
-                        ViewTransition.Fade(0.15.seconds)
-                    )
-                }
-            } else if (it.isControlDown && it.code == KeyCode.S) {
-                it.consume()
-
-                val dialog = TextInputDialog()
-                dialog.headerText = "Saison auswählen"
-                dialog.title = "Saison auswählen"
-
-                val result = dialog.showAndWait()
-                result.ifPresent {
-                    val saison = it.toIntOrNull()
-                    this@GruppeDetailedView.replaceWith(
-                        find<GruppeDetailedView>(mapOf("phase" to phase, "saison" to saison)),
-                        ViewTransition.Fade(0.15.seconds)
-                    )
+                runLater {
+                    resize()
                 }
             }
-        }
-
-        runLater {
-            requestFocus()
         }
     }
 
-    init {
-        primaryStage.isMaximized = true
+    private fun resize() {
+        stage?.sizeToScene()
+        stage?.centerOnScreen()
+    }
 
+    init {
         title = "$phase (Saison ${saison - 1}/$saison)"
     }
 }

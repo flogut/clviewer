@@ -19,7 +19,7 @@ import tornadofx.vbox
  * Baut das UI des Turnierbaums.
  * @param saison Saison, deren Verlauf dargestellt werden soll
  */
-fun buildTurnierbaum(saison: Int) = GridPane().apply {
+fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane().apply {
     hgap = 20.0
 
     val turnier = KoSpiele(saison).getTurnierbaum()
@@ -86,7 +86,7 @@ fun buildTurnierbaum(saison: Int) = GridPane().apply {
         }
     }
 
-    return@apply
+    op?.invoke(this)
 }
 
 /**
