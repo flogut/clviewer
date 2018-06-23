@@ -132,11 +132,18 @@ class GruppeDetailedView : Fragment() {
                     vgap = 3.0
                     alignment = Pos.TOP_CENTER
 
+                    setOnMouseClicked {
+                        val spiel = spiele[(it.y / 37.5).toInt()]
+                        val view = tornadofx.find<SpielView>(params = mapOf("spiel" to spiel))
+                        val stage = view.openWindow(resizable = false)
+                        view.stage = stage
+                    }
+
                     for (spiel in spiele) {
                         row {
                             // Wappen Heimmannschaft
                             imageview(wappen.getValue(spiel.daheim)) {
-                                fitWidth = 35.0
+                                fitHeight = 35.0
                                 isPreserveRatio = true
                                 isSmooth = true
                             }

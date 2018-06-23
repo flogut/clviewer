@@ -7,6 +7,7 @@ import de.hgv.model.Verein
 import javafx.geometry.Pos
 import javafx.scene.image.Image
 import javafx.scene.layout.GridPane
+import tornadofx.find
 import tornadofx.gridpane
 import tornadofx.gridpaneConstraints
 import tornadofx.imageview
@@ -35,6 +36,13 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
 
                 buildSpiel(paarung, 0, wappen)
                 buildSpiel(paarung, 1, wappen)
+
+                setOnMouseClicked {
+                    val spiel = if (it.y < 50) { paarung?.get(0) } else { paarung?.get(1) }
+                    val view = find<SpielView>(params = mapOf("spiel" to spiel))
+                    val stage = view.openWindow(resizable = false)
+                    view.stage = stage
+                }
             }
             gridpaneConstraints {
                 columnRowIndex(i / 4 * 6, 2 * (i % 4))
@@ -51,6 +59,13 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
 
                 buildSpiel(paarung, 0, wappen)
                 buildSpiel(paarung, 1, wappen)
+
+                setOnMouseClicked {
+                    val spiel = if (it.y < 50) { paarung?.get(0) } else { paarung?.get(1) }
+                    val view = find<SpielView>(params = mapOf("spiel" to spiel))
+                    val stage = view.openWindow(resizable = false)
+                    view.stage = stage
+                }
             }
             gridpaneConstraints {
                 columnRowIndex(4 * (i / 2) + 1, 4 * (i % 2) + 1)
@@ -67,6 +82,13 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
 
                 buildSpiel(paarung, 0, wappen)
                 buildSpiel(paarung, 1, wappen)
+
+                setOnMouseClicked {
+                    val spiel = if (it.y < 50) { paarung?.get(0) } else { paarung?.get(1) }
+                    val view = find<SpielView>(params = mapOf("spiel" to spiel))
+                    val stage = view.openWindow(resizable = false)
+                    view.stage = stage
+                }
             }
             gridpaneConstraints {
                 columnRowIndex((i + 1) * 2, 3)
@@ -79,6 +101,13 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
         gridpane {
             hgap = 10.0
             buildSpiel(turnier[Phase.FINALE]?.get(0), 0, wappen)
+
+            setOnMouseClicked {
+                val spiel = turnier[Phase.FINALE]?.get(0)?.get(0)
+                val view = find<SpielView>(params = mapOf("spiel" to spiel))
+                val stage = view.openWindow(resizable = false)
+                view.stage = stage
+            }
         }
         gridpaneConstraints {
             columnRowIndex(3, 3)
