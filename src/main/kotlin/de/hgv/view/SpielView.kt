@@ -8,6 +8,7 @@ import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.scene.text.Font
 import javafx.scene.text.FontWeight
+import javafx.stage.Stage
 import tornadofx.Fragment
 import tornadofx.gridpane
 import tornadofx.gridpaneColumnConstraints
@@ -20,7 +21,6 @@ import tornadofx.row
 import tornadofx.runAsyncWithOverlay
 import tornadofx.runLater
 import tornadofx.scrollpane
-import tornadofx.seconds
 import tornadofx.tooltip
 import tornadofx.useMaxWidth
 import tornadofx.vbox
@@ -31,6 +31,7 @@ class SpielView : Fragment() {
         "http://www.weltfussball.de/spielbericht/champions-league-2012-2013-finale-borussia-dortmund-bayern-muenchen/",
         true
     )
+    var stage: Stage? = null
 
     override val root = scrollpane {
         if (spiel == null) return@scrollpane
@@ -108,9 +109,18 @@ class SpielView : Fragment() {
                             add(auswaerts)
                         }
                     }
+
+                    runLater {
+                        resize()
+                    }
                 }
             }
         }
+    }
+
+    private fun resize() {
+        stage?.sizeToScene()
+        stage?.centerOnScreen()
     }
 
     private fun buildAufstellung(spiel: Spiel.Details, team: Team, op: (VBox.() -> Unit)? = null): VBox {
@@ -153,19 +163,6 @@ class SpielView : Fragment() {
                         }
                     }
 
-                    if (auswechslungen.any { it.aus == spieler }) {
-                        val auswechslung = auswechslungen.find { it.aus == spieler }!!
-                        val pfeil = resources.image("/resources/pfeil-rot.png")
-
-                        imageview(pfeil) {
-                            fitHeight = picHeight
-                            isSmooth = true
-                            isPreserveRatio = true
-
-                            tooltip("${auswechslung.spielminute}' (${auswechslung.ein.name})")
-                        }
-                    }
-
                     if (tore.any { it.torschuetze == spieler }) {
                         for (tor in tore.filter { it.torschuetze == spieler }) {
                             val image = when {
@@ -179,8 +176,21 @@ class SpielView : Fragment() {
                                 isSmooth = true
                                 isPreserveRatio = true
 
-                                tooltip("${tor.spielminute}' ${tor.vorlagengeber?.name?.let { " ($it)" }}")
+                                tooltip("${tor.spielminute}' ${tor.vorlagengeber?.name?.let { " ($it)" } ?: ""}")
                             }
+                        }
+                    }
+
+                    if (auswechslungen.any { it.aus == spieler }) {
+                        val auswechslung = auswechslungen.find { it.aus == spieler }!!
+                        val pfeil = resources.image("/resources/pfeil-rot.png")
+
+                        imageview(pfeil) {
+                            fitHeight = picHeight
+                            isSmooth = true
+                            isPreserveRatio = true
+
+                            tooltip("${auswechslung.spielminute}' (${auswechslung.ein.name})")
                         }
                     }
                 }
@@ -217,14 +227,14 @@ class SpielView : Fragment() {
                         isSmooth = true
                         isPreserveRatio = true
 
-                        tooltip("${auswechslung.spielminute} (${auswechslung.ein.name})")
+                        tooltip("${auswechslung.spielminute}' (${auswechslung.aus.name})")
                     }
 
                     if (tore.any { it.torschuetze == auswechslung.ein }) {
                         for (tor in tore.filter { it.torschuetze == auswechslung.ein }) {
                             val image = when {
                                 tor.eigentor -> resources.image("/resources/ball-rot.png")
-                                tor.elfmeter -> resources.image("/resources/ball-rot.png") // TODO Elfmeter kennzeichnen
+                                tor.elfmeter -> resources.image("/resources/ball.png") // TODO Elfmeter kennzeichnen
                                 else -> resources.image("/resources/ball.png")
                             }
 
@@ -233,7 +243,7 @@ class SpielView : Fragment() {
                                 isSmooth = true
                                 isPreserveRatio = true
 
-                                tooltip("${tor.spielminute}' ${tor.vorlagengeber?.name?.let { " ($it)" }}")
+                                tooltip("${tor.spielminute}'${tor.vorlagengeber?.name?.let { " ($it)" } ?: ""}")
                             }
                         }
                     }
@@ -246,14 +256,8 @@ class SpielView : Fragment() {
         return liste
     }
 
-    init {
-        runLater(1.5.seconds) {
-            primaryStage.sizeToScene()
-            primaryStage.centerOnScreen()
-        }
+    private enum class Team {
+        HEIM, AUSWAERTS
     }
-}
 
-private enum class Team {
-    HEIM, AUSWAERTS
 }
