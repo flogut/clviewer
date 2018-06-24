@@ -26,7 +26,7 @@ import tornadofx.useMaxWidth
 import tornadofx.vbox
 import java.time.format.DateTimeFormatter
 
-class SpielView : Fragment() {
+class SpielView: Fragment() {
     val spiel = params["spiel"] as? Spiel ?: ActiveProvider.getSpiel(
         "http://www.weltfussball.de/spielbericht/champions-league-2012-2013-finale-borussia-dortmund-bayern-muenchen/",
         true
@@ -126,8 +126,11 @@ class SpielView : Fragment() {
     private fun buildAufstellung(spiel: Spiel.Details, team: Team, op: (VBox.() -> Unit)? = null): VBox {
         val startelf = if (team == Team.HEIM) spiel.startelfHeim else spiel.startelfAuswaerts
         val auswechslungen = if (team == Team.HEIM) spiel.auswechslungenHeim else spiel.auswechslungenAuswaerts
-        val karten =
-            if (team == Team.HEIM) spiel.kartenHeim.sortedBy { it.spielminute } else spiel.kartenAuswaerts.sortedBy { it.spielminute }
+        val karten = if (team == Team.HEIM) {
+            spiel.kartenHeim.sortedBy { it.spielminute }
+        } else {
+            spiel.kartenAuswaerts.sortedBy { it.spielminute }
+        }
         val tore = spiel.tore
         val pos = if (team == Team.HEIM) Pos.TOP_LEFT else Pos.TOP_RIGHT
 
@@ -146,7 +149,6 @@ class SpielView : Fragment() {
                         val stage = view.openWindow(resizable = false)
                         view.stage = stage
                     }
-
 
                     label(spieler.name.trim()) {
                         font = Font.font(fontSize)
@@ -276,5 +278,4 @@ class SpielView : Fragment() {
     private enum class Team {
         HEIM, AUSWAERTS
     }
-
 }

@@ -18,8 +18,6 @@ data class Spieler(
     var details: Details? = null
         get() = field ?: ActiveProvider.getDetailsForSpieler(this).also { field = it }
 
-
-
     /**
      * @author Florian Gutekunst
      */
