@@ -120,7 +120,7 @@ class SpielProvider {
                     )
                 }
 
-            val spielminute = tor.ownText().substringBefore(". /").trim().toIntOrNull()
+            val spielminute = tor.ownText().substringBefore(". ").trim().toIntOrNull()
 
             val eigentor = tor.ownText().contains("Eigentor")
 
