@@ -2,7 +2,6 @@ package de.hgv.view
 
 import de.hgv.model.Kartenart
 import de.hgv.model.Spiel
-import de.hgv.provider.ActiveProvider
 import javafx.geometry.Pos
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
@@ -26,11 +25,8 @@ import tornadofx.useMaxWidth
 import tornadofx.vbox
 import java.time.format.DateTimeFormatter
 
-class SpielView: Fragment() {
-    val spiel = params["spiel"] as? Spiel ?: ActiveProvider.getSpiel(
-        "http://www.weltfussball.de/spielbericht/champions-league-2012-2013-finale-borussia-dortmund-bayern-muenchen/",
-        true
-    )
+class SpielView : Fragment() {
+    val spiel = params["spiel"] as? Spiel
     var stage: Stage? = null
 
     override val root = scrollpane {
@@ -58,6 +54,8 @@ class SpielView: Fragment() {
                                 isPreserveRatio = true
                                 isSmooth = true
 
+                                tooltip(spiel.daheim.name)
+
                                 gridpaneColumnConstraints {
                                     percentWidth = 100 / 3.0
                                 }
@@ -77,6 +75,8 @@ class SpielView: Fragment() {
                                 fitHeight = 100.0
                                 isPreserveRatio = true
                                 isSmooth = true
+
+                                tooltip(spiel.auswaerts.name)
 
                                 gridpaneColumnConstraints {
                                     percentWidth = 100 / 3.0
@@ -184,7 +184,8 @@ class SpielView: Fragment() {
                                 isSmooth = true
                                 isPreserveRatio = true
 
-                                tooltip("${tor.spielminute}' ${tor.vorlagengeber?.name?.let { " ($it)" } ?: ""}")
+                                tooltip(tor.spielminute.toString() + "' " + (tor.vorlagengeber?.name?.let { " ($it)" }
+                                        ?: "") + (if (tor.eigentor) "Eigentor" else ""))
                             }
                         }
                     }
@@ -256,7 +257,8 @@ class SpielView: Fragment() {
                                 isSmooth = true
                                 isPreserveRatio = true
 
-                                tooltip("${tor.spielminute}'${tor.vorlagengeber?.name?.let { " ($it)" } ?: ""}")
+                                tooltip(tor.spielminute.toString() + "' " + (tor.vorlagengeber?.name?.let { " ($it)" }
+                                        ?: "") + (if (tor.eigentor) "Eigentor" else ""))
                             }
                         }
                     }
