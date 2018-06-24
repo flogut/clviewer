@@ -217,6 +217,15 @@ class SpielView: Fragment() {
                         font = Font.font(fontSize)
                     }
 
+                    val pfeil = resources.image("/resources/pfeil-gruen.png")
+                    imageview(pfeil) {
+                        fitHeight = picHeight
+                        isSmooth = true
+                        isPreserveRatio = true
+
+                        tooltip("${auswechslung.spielminute}' (${auswechslung.aus.name})")
+                    }
+
                     if (karten.any { it.spieler == auswechslung.ein }) {
                         val karte = karten.findLast { it.spieler == auswechslung.ein }!!
                         val image = when (karte.art) {
@@ -232,15 +241,6 @@ class SpielView: Fragment() {
 
                             tooltip("${karte.spielminute}'")
                         }
-                    }
-
-                    val pfeil = resources.image("/resources/pfeil-gruen.png")
-                    imageview(pfeil) {
-                        fitHeight = picHeight
-                        isSmooth = true
-                        isPreserveRatio = true
-
-                        tooltip("${auswechslung.spielminute}' (${auswechslung.aus.name})")
                     }
 
                     if (tore.any { it.torschuetze == auswechslung.ein }) {
