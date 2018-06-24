@@ -5,6 +5,7 @@ import de.hgv.model.Phase
 import de.hgv.model.Spiel
 import de.hgv.model.Verein
 import javafx.geometry.Pos
+import javafx.scene.Cursor
 import javafx.scene.image.Image
 import javafx.scene.layout.GridPane
 import tornadofx.find
@@ -12,6 +13,7 @@ import tornadofx.gridpane
 import tornadofx.gridpaneConstraints
 import tornadofx.imageview
 import tornadofx.label
+import tornadofx.onHover
 import tornadofx.row
 import tornadofx.tooltip
 import tornadofx.vbox
@@ -43,6 +45,10 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
                     val stage = view.openWindow(resizable = false)
                     view.stage = stage
                 }
+
+                onHover { hovering ->
+                    cursor = if (hovering) { Cursor.HAND } else { Cursor.DEFAULT }
+                }
             }
             gridpaneConstraints {
                 columnRowIndex(i / 4 * 6, 2 * (i % 4))
@@ -65,6 +71,10 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
                     val view = find<SpielView>(params = mapOf("spiel" to spiel))
                     val stage = view.openWindow(resizable = false)
                     view.stage = stage
+                }
+
+                onHover { hovering ->
+                    cursor = if (hovering) { Cursor.HAND } else { Cursor.DEFAULT }
                 }
             }
             gridpaneConstraints {
@@ -89,6 +99,10 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
                     val stage = view.openWindow(resizable = false)
                     view.stage = stage
                 }
+
+                onHover { hovering ->
+                    cursor = if (hovering) { Cursor.HAND } else { Cursor.DEFAULT }
+                }
             }
             gridpaneConstraints {
                 columnRowIndex((i + 1) * 2, 3)
@@ -107,6 +121,10 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
                 val view = find<SpielView>(params = mapOf("spiel" to spiel))
                 val stage = view.openWindow(resizable = false)
                 view.stage = stage
+            }
+
+            onHover { hovering ->
+                cursor = if (hovering) { Cursor.HAND } else { Cursor.DEFAULT }
             }
         }
         gridpaneConstraints {

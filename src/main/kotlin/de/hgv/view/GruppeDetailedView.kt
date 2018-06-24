@@ -3,6 +3,7 @@ package de.hgv.view
 import de.hgv.model.Phase
 import de.hgv.provider.ActiveProvider
 import javafx.geometry.Pos
+import javafx.scene.Cursor
 import javafx.scene.layout.Priority
 import javafx.scene.text.Font
 import javafx.scene.text.FontWeight
@@ -13,6 +14,7 @@ import tornadofx.gridpane
 import tornadofx.gridpaneConstraints
 import tornadofx.imageview
 import tornadofx.label
+import tornadofx.onHover
 import tornadofx.paddingLeft
 import tornadofx.paddingRight
 import tornadofx.row
@@ -137,6 +139,10 @@ class GruppeDetailedView : Fragment() {
                         val view = tornadofx.find<SpielView>(params = mapOf("spiel" to spiel))
                         val stage = view.openWindow(resizable = false)
                         view.stage = stage
+                    }
+
+                    onHover { hovering ->
+                        cursor = if (hovering) { Cursor.HAND } else { Cursor.DEFAULT }
                     }
 
                     for (spiel in spiele) {

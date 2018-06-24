@@ -3,6 +3,7 @@ package de.hgv.view
 import de.hgv.model.Kartenart
 import de.hgv.model.Spiel
 import javafx.geometry.Pos
+import javafx.scene.Cursor
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.scene.text.Font
@@ -15,6 +16,7 @@ import tornadofx.hbox
 import tornadofx.hgrow
 import tornadofx.imageview
 import tornadofx.label
+import tornadofx.onHover
 import tornadofx.pane
 import tornadofx.row
 import tornadofx.runAsyncWithOverlay
@@ -152,6 +154,10 @@ class SpielView : Fragment() {
 
                     label(spieler.name.trim()) {
                         font = Font.font(fontSize)
+
+                        onHover { hovering ->
+                            cursor = if (hovering) { Cursor.HAND } else { Cursor.DEFAULT }
+                        }
                     }
 
                     if (karten.any { it.spieler == spieler }) {
@@ -185,7 +191,7 @@ class SpielView : Fragment() {
                                 isPreserveRatio = true
 
                                 tooltip(tor.spielminute.toString() + "' " + (tor.vorlagengeber?.name?.let { " ($it)" }
-                                        ?: "") + (if (tor.eigentor) "Eigentor" else ""))
+                                        ?: "") + if (tor.eigentor) "Eigentor" else "")
                             }
                         }
                     }
@@ -216,6 +222,10 @@ class SpielView : Fragment() {
 
                     label(auswechslung.ein.name.trim()) {
                         font = Font.font(fontSize)
+
+                        onHover { hovering ->
+                            cursor = if (hovering) { Cursor.HAND } else { Cursor.DEFAULT }
+                        }
                     }
 
                     val pfeil = resources.image("/resources/pfeil-gruen.png")
@@ -258,7 +268,7 @@ class SpielView : Fragment() {
                                 isPreserveRatio = true
 
                                 tooltip(tor.spielminute.toString() + "' " + (tor.vorlagengeber?.name?.let { " ($it)" }
-                                        ?: "") + (if (tor.eigentor) "Eigentor" else ""))
+                                        ?: "") + if (tor.eigentor) "Eigentor" else "")
                             }
                         }
                     }
