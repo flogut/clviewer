@@ -88,7 +88,11 @@ class SpielProvider {
      * @return Die Details, oder null, wenn ein Fehler auftritt
      */
     fun getDetailsForSpiel(spiel: Spiel): Spiel.Details? {
-        val linkPhase = spiel.phase.toLink()
+        var linkPhase = spiel.phase.toLink()
+        if (spiel.saison <= 2008 && spiel.phase == Phase.FINALE) {
+            linkPhase = "endspiel"
+        }
+
         val link =
             "http://www.weltfussball.de/spielbericht/champions-league-${spiel.saison - 1}-${spiel.saison}-$linkPhase" +
                     "-${spiel.daheim.id}-${spiel.auswaerts.id}"

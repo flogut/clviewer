@@ -146,17 +146,18 @@ class SpielView : Fragment() {
             for (spieler in startelf) {
                 hbox(alignment = Pos.CENTER_LEFT, spacing = 5.0) {
                     hgrow = Priority.ALWAYS
-                    setOnMouseClicked {
-                        val view = tornadofx.find<SpielerView>(params = mapOf("spieler" to spieler))
-                        val stage = view.openWindow(resizable = false)
-                        view.stage = stage
-                    }
 
                     label(spieler.name.trim()) {
                         font = Font.font(fontSize)
 
                         onHover { hovering ->
                             cursor = if (hovering) { Cursor.HAND } else { Cursor.DEFAULT }
+                        }
+
+                        setOnMouseClicked {
+                            val view = tornadofx.find<SpielerView>(params = mapOf("spieler" to spieler))
+                            val stage = view.openWindow(resizable = false)
+                            view.stage = stage
                         }
                     }
 
@@ -214,17 +215,18 @@ class SpielView : Fragment() {
             for (auswechslung in auswechslungen) {
                 hbox(alignment = Pos.CENTER_LEFT, spacing = 5.0) {
                     hgrow = Priority.ALWAYS
-                    setOnMouseClicked {
-                        val view = tornadofx.find<SpielerView>(params = mapOf("spieler" to auswechslung.ein))
-                        val stage = view.openWindow(resizable = false)
-                        view.stage = stage
-                    }
 
                     label(auswechslung.ein.name.trim()) {
                         font = Font.font(fontSize)
 
                         onHover { hovering ->
                             cursor = if (hovering) { Cursor.HAND } else { Cursor.DEFAULT }
+                        }
+
+                        setOnMouseClicked {
+                            val view = tornadofx.find<SpielerView>(params = mapOf("spieler" to auswechslung.ein))
+                            val stage = view.openWindow(resizable = false)
+                            view.stage = stage
                         }
                     }
 
