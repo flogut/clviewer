@@ -68,6 +68,10 @@ object Download {
             return getCachedWappen(verein)
         }
 
+        if (verein.name.contains("Inter")) {
+            return Image(Download.javaClass.getResourceAsStream("/resources/wappen/inter.png"))
+        }
+
         val inputStream = download(verein.wappenURL) ?: throw Exception("Wappen konnte nicht heruntergeladen werden")
 
         val bytes = inputStream.readBytes()

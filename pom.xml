@@ -83,7 +83,7 @@
                 <directory>src/main/resources</directory>
                 <targetPath>resources</targetPath>
                 <includes>
-                    <include>*.png</include>
+                    <include>*/**</include>
                 </includes>
             </resource>
         </resources>
