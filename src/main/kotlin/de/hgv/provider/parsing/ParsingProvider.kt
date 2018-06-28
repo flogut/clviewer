@@ -19,7 +19,7 @@ import java.util.Locale
  *
  * @author Florian Gutekunst
  */
-open class ParsingProvider: Provider {
+open class ParsingProvider : Provider {
 
     private val spielerProvider = SpielerProvider()
     private val spielProvider = SpielProvider()
@@ -38,8 +38,10 @@ open class ParsingProvider: Provider {
     override fun getDetailsForSpiel(spiel: Spiel): Spiel.Details? = spielProvider.getDetailsForSpiel(spiel)
 
     override fun getSpiele(saison: Int): List<Spiel> {
+        // In der Saison 2010/11 ist hinter steht hinter 2011 noch "_3"
         val url =
-            "http://www.weltfussball.de/alle_spiele/champions-league-${saison - 1}-$saison" + (if (saison == 2011) "_3" else "") + "/"
+            "http://www.weltfussball.de/alle_spiele/champions-league-${saison - 1}-$saison" +
+                    (if (saison == 2011) "_3" else "") + "/"
 
         val doc =
             Jsoup.parse(URL(url), 5000)

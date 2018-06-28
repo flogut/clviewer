@@ -26,8 +26,7 @@ import java.time.format.DateTimeFormatter
 
 /**
  * Stellt die Details zu einem Spieler dar. Der Spielers wird über die params von TornadoFX übergeben mit dem
- * Key "spieler". <br>
- * TODO Statt params Konstruktor verwenden?
+ * Key "spieler".
  *
  * @author Florian Gutekunst
  */

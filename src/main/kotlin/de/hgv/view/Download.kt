@@ -68,6 +68,7 @@ object Download {
             return getCachedWappen(verein)
         }
 
+        // Das Inter-Wappen von der Website kann nicht geladen werden -> Wappen wird von uns mitgeliefert
         if (verein.name.contains("Inter")) {
             return Image(Download.javaClass.getResourceAsStream("/resources/wappen/inter.png"))
         }

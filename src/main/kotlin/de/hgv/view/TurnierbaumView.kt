@@ -26,7 +26,7 @@ import tornadofx.vgrow
 import java.time.LocalDate
 
 /**
- * Stellt den Turnierbaum dar. Hauptbildschirm der Anwendung.
+ * Stellt den Turnierbaum dar. Die Saison wird über die Params mit dem Key "saison" übergeben.
  *
  * @author Tobias Döttling
  */

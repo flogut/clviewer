@@ -88,6 +88,7 @@ class SpielProvider {
      * @return Die Details, oder null, wenn ein Fehler auftritt
      */
     fun getDetailsForSpiel(spiel: Spiel): Spiel.Details? {
+        // Vor der Saison 2007/08 heißt das Finale im Link "endspiel"
         var linkPhase = spiel.phase.toLink()
         if (spiel.saison <= 2008 && spiel.phase == Phase.FINALE) {
             linkPhase = "endspiel"

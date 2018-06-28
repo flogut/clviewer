@@ -27,6 +27,11 @@ import tornadofx.useMaxWidth
 import tornadofx.vbox
 import java.time.format.DateTimeFormatter
 
+/**
+ * Stellt die Details zu einem Spiel dar. Das Spiel wird über die params von TornadoFX mit dem Key "spiel" übergeben.
+ *
+ * @author Niklas Cölle, Moritz Brandt, Florian Gutekunst (Unterstützung)
+ */
 class SpielView : Fragment() {
     val spiel = params["spiel"] as? Spiel
     var stage: Stage? = null
@@ -42,6 +47,7 @@ class SpielView : Fragment() {
 
                     details to wappen
                 } ui { (details, wappen) ->
+                    // Datum
                     label(spiel.datum.format(DateTimeFormatter.ofPattern("eeee, dd. MMMM yyyy"))) {
                         alignment = Pos.CENTER
                         useMaxWidth = true
@@ -51,6 +57,7 @@ class SpielView : Fragment() {
 
                     gridpane {
                         row {
+                            // Wappen Heimmannschaft
                             imageview(wappen[spiel.daheim]!!) {
                                 fitHeight = 100.0
                                 isPreserveRatio = true
@@ -63,6 +70,7 @@ class SpielView : Fragment() {
                                 }
                             }
 
+                            // Ergebnis
                             label("${spiel.toreHeim} : ${spiel.toreAuswaerts}") {
                                 alignment = Pos.CENTER
                                 useMaxWidth = true
@@ -73,6 +81,7 @@ class SpielView : Fragment() {
                                 }
                             }
 
+                            // Wappen Auswärtsmannschaft
                             imageview(wappen[spiel.auswaerts]!!) {
                                 fitHeight = 100.0
                                 isPreserveRatio = true
@@ -91,16 +100,7 @@ class SpielView : Fragment() {
                         hbox {
                             useMaxWidth = true
 
-                            val heim = buildAufstellung(details, Team.HEIM) {
-                                gridpaneColumnConstraints {
-                                    percentWidth = 50.0
-                                }
-                                hgrow = Priority.ALWAYS
-                            }
-
-                            add(heim)
-
-                            val auswaerts = buildAufstellung(details, Team.AUSWAERTS) {
+                            children += buildAufstellung(details, Team.HEIM) {
                                 gridpaneColumnConstraints {
                                     percentWidth = 50.0
                                 }
@@ -108,10 +108,17 @@ class SpielView : Fragment() {
                                 hgrow = Priority.ALWAYS
                             }
 
-                            add(auswaerts)
+                            children += buildAufstellung(details, Team.AUSWAERTS) {
+                                gridpaneColumnConstraints {
+                                    percentWidth = 50.0
+                                }
+
+                                hgrow = Priority.ALWAYS
+                            }
                         }
                     }
 
+                    // Setzt die Größe des Fensters neu, nachdem das Laden abgeschlossen ist
                     runLater {
                         resize()
                     }
@@ -125,13 +132,19 @@ class SpielView : Fragment() {
         stage?.centerOnScreen()
     }
 
+    /**
+     * Baut das UI der Aufstellung eines Teams.
+     * @param spiel Spiel, dessen Aufstellung angezeigt werden soll
+     * @param team Team, dessen Aufstellung angezeigt werden soll (heim oder auswärts)
+     * @param op Optionale Funktion für weitere Einstellungen auf dem resultierenden UI
+     */
     private fun buildAufstellung(spiel: Spiel.Details, team: Team, op: (VBox.() -> Unit)? = null): VBox {
         val startelf = if (team == Team.HEIM) spiel.startelfHeim else spiel.startelfAuswaerts
         val auswechslungen = if (team == Team.HEIM) spiel.auswechslungenHeim else spiel.auswechslungenAuswaerts
         val karten = if (team == Team.HEIM) {
-            spiel.kartenHeim.sortedBy { it.spielminute }
+            spiel.kartenHeim
         } else {
-            spiel.kartenAuswaerts.sortedBy { it.spielminute }
+            spiel.kartenAuswaerts
         }
         val tore = spiel.tore
         val pos = if (team == Team.HEIM) Pos.TOP_LEFT else Pos.TOP_RIGHT
@@ -143,17 +156,24 @@ class SpielView : Fragment() {
             alignment = pos
             useMaxWidth = true
 
+            // Startelf
             for (spieler in startelf) {
                 hbox(alignment = Pos.CENTER_LEFT, spacing = 5.0) {
                     hgrow = Priority.ALWAYS
 
+                    // Name
                     label(spieler.name.trim()) {
                         font = Font.font(fontSize)
 
                         onHover { hovering ->
-                            cursor = if (hovering) { Cursor.HAND } else { Cursor.DEFAULT }
+                            cursor = if (hovering) {
+                                Cursor.HAND
+                            } else {
+                                Cursor.DEFAULT
+                            }
                         }
 
+                        // Öffnet das Fenster mit den Details zu dem Spieler
                         setOnMouseClicked {
                             val view = tornadofx.find<SpielerView>(params = mapOf("spieler" to spieler))
                             val stage = view.openWindow(resizable = false)
@@ -161,6 +181,7 @@ class SpielView : Fragment() {
                         }
                     }
 
+                    // Zeigt Karten des Spielers an
                     if (karten.any { it.spieler == spieler }) {
                         val karte = karten.findLast { it.spieler == spieler }!!
                         val image = when (karte.art) {
@@ -178,6 +199,7 @@ class SpielView : Fragment() {
                         }
                     }
 
+                    // Zeigt Tore des Spielers an
                     if (tore.any { it.torschuetze == spieler }) {
                         for (tor in tore.filter { it.torschuetze == spieler }) {
                             val image = when {
@@ -197,6 +219,7 @@ class SpielView : Fragment() {
                         }
                     }
 
+                    // Zeigt an, ob der Spieler ausgewechselt wurde
                     if (auswechslungen.any { it.aus == spieler }) {
                         val auswechslung = auswechslungen.find { it.aus == spieler }!!
                         val pfeil = resources.image("/resources/pfeil-rot.png")
@@ -212,17 +235,24 @@ class SpielView : Fragment() {
                 }
             }
 
+            // Eingewechselte Spieler
             for (auswechslung in auswechslungen) {
                 hbox(alignment = Pos.CENTER_LEFT, spacing = 5.0) {
                     hgrow = Priority.ALWAYS
 
+                    // Name
                     label(auswechslung.ein.name.trim()) {
                         font = Font.font(fontSize)
 
                         onHover { hovering ->
-                            cursor = if (hovering) { Cursor.HAND } else { Cursor.DEFAULT }
+                            cursor = if (hovering) {
+                                Cursor.HAND
+                            } else {
+                                Cursor.DEFAULT
+                            }
                         }
 
+                        // Öffnet ein Fenster mit den Details zu dem Spieler
                         setOnMouseClicked {
                             val view = tornadofx.find<SpielerView>(params = mapOf("spieler" to auswechslung.ein))
                             val stage = view.openWindow(resizable = false)
@@ -230,6 +260,7 @@ class SpielView : Fragment() {
                         }
                     }
 
+                    // Zeigt den Einwechslungspfeil an
                     val pfeil = resources.image("/resources/pfeil-gruen.png")
                     imageview(pfeil) {
                         fitHeight = picHeight
@@ -239,6 +270,7 @@ class SpielView : Fragment() {
                         tooltip("${auswechslung.spielminute}' (${auswechslung.aus.name})")
                     }
 
+                    // Zeigt Karten des Spielers an
                     if (karten.any { it.spieler == auswechslung.ein }) {
                         val karte = karten.findLast { it.spieler == auswechslung.ein }!!
                         val image = when (karte.art) {
@@ -256,6 +288,7 @@ class SpielView : Fragment() {
                         }
                     }
 
+                    // Zeigt Tore des Spielers an
                     if (tore.any { it.torschuetze == auswechslung.ein }) {
                         for (tor in tore.filter { it.torschuetze == auswechslung.ein }) {
                             val image = when {

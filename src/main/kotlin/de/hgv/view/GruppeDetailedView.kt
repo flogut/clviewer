@@ -28,8 +28,7 @@ import java.time.LocalDate
 
 /**
  * Stellt die zu einer Gruppe die Tabelle und die Spiele (sortiert nach Datum) einer Saison dar. Die Gruppe und die
- * Saison werden über die params von TornadoFX mit den Keys "phase" und "saison" übergeben. <br>
- * TODO Statt params Konstruktor verwenden?
+ * Saison werden über die params von TornadoFX mit den Keys "phase" und "saison" übergeben.
  *
  * @author Florian Gutekunst
  */
