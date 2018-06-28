@@ -31,16 +31,9 @@ import java.time.LocalDate
  * @author Tobias Döttling
  */
 class TurnierbaumView : Fragment() {
-    val saison = params["saison"] as? Int ?: LocalDate.now().let {
-        if (it.isBefore(LocalDate.of(it.year, 7, 1))) {
-            it.year
-        } else {
-            it.year + 1
-        }
-    }
+    val saison = params["saison"] as? Int ?: aktuelleSaison()
     private val saisonProptery = SimpleIntegerProperty(saison)
-    // TODO Akutelle Saison statt 2018 verwnden
-    private val jahre = (2018 downTo 2004).toList().observable()
+    private val jahre = (aktuelleSaison() downTo 2004).toList().observable()
 
     override val root = vbox {
         useMaxSize = true
@@ -108,6 +101,18 @@ class TurnierbaumView : Fragment() {
         saisonProptery.onChange { neu ->
             val turnierbaumNeu = find<TurnierbaumView>(mapOf("saison" to neu))
             this.replaceWith(turnierbaumNeu, ViewTransition.Fade(15.millis))
+        }
+    }
+
+    /**
+     * Gibt die aktuelle Saison zurück. Stichtag ist der 1. September, da dann die Auslosung der Gruppenphase bereits
+     * stattgefunden hat.
+     */
+    private fun aktuelleSaison(): Int = LocalDate.now().let {
+        if (it.isBefore(LocalDate.of(it.year, 9, 1))) {
+            it.year
+        } else {
+            it.year + 1
         }
     }
 }

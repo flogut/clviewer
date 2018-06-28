@@ -24,7 +24,6 @@ import tornadofx.useMaxSize
 import tornadofx.useMaxWidth
 import tornadofx.vbox
 import tornadofx.vgrow
-import java.time.LocalDate
 
 /**
  * Stellt die zu einer Gruppe die Tabelle und die Spiele (sortiert nach Datum) einer Saison dar. Die Gruppe und die
@@ -34,18 +33,8 @@ import java.time.LocalDate
  */
 class GruppeDetailedView : Fragment() {
 
-    /**
-     * Wird keine Saison übergeben, wird die aktuelle Saison genutzt.
-     */
-    val saison = params["saison"] as? Int ?: LocalDate.now().let {
-        if (it.isBefore(LocalDate.of(it.year, 7, 1))) {
-            it.year
-        } else {
-            it.year - 1
-        }
-    }
-
-    val phase = params["phase"] as? Phase ?: Phase.GRUPPE_A
+    val saison = params["saison"] as Int
+    val phase = params["phase"] as Phase
     private val tabelle = ActiveProvider.getTabelle(phase.toString(), saison)
     private val spiele = ActiveProvider.getSpieleInPhase(phase, saison).sortedBy { it.datum }
 
