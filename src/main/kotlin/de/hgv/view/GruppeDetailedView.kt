@@ -35,8 +35,6 @@ class GruppeDetailedView : Fragment() {
 
     val saison = params["saison"] as Int
     val phase = params["phase"] as Phase
-    private val tabelle = ActiveProvider.getTabelle(phase.toString(), saison)
-    private val spiele = ActiveProvider.getSpieleInPhase(phase, saison).sortedBy { it.datum }
 
     var stage: Stage? = null
 
@@ -49,9 +47,12 @@ class GruppeDetailedView : Fragment() {
             vgrow = Priority.ALWAYS
 
             runAsyncWithOverlay {
-                // Download der Wappen während ein Ladekreis angezeigt wird => Gibt eine Map von Verein zu Wappen zurück
-                Download.downloadWappen(tabelle?.tabelle?.map { it.verein }.orEmpty())
-            } ui { wappen ->
+                val tabelle = ActiveProvider.getTabelle(phase.toString(), saison)
+                val spiele = ActiveProvider.getSpieleInPhase(phase, saison).sortedBy { it.datum }
+                val wappen = Download.downloadWappen(tabelle?.tabelle?.map { it.verein }.orEmpty())
+
+                Triple(tabelle, spiele, wappen)
+            } ui { (tabelle, spiele, wappen)->
                 // Überschrift Tabelle
                 label("Tabelle") {
                     useMaxWidth = true
