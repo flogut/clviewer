@@ -19,6 +19,7 @@ import tornadofx.millis
 import tornadofx.observable
 import tornadofx.onChange
 import tornadofx.runAsyncWithOverlay
+import tornadofx.scrollpane
 import tornadofx.useMaxSize
 import tornadofx.useMaxWidth
 import tornadofx.vbox
@@ -35,60 +36,62 @@ class TurnierbaumView : Fragment() {
     private val saisonProptery = SimpleIntegerProperty(saison)
     private val jahre = (aktuelleSaison() downTo 2004).toList().observable()
 
-    override val root = vbox {
-        useMaxSize = true
+    override val root = scrollpane {
+        vbox {
+            useMaxSize = true
 
-        menubar {
-            for (gruppe in Phase.values().filter { it.bevor(Phase.ACHTELFINALE) }) {
-                menu(gruppe.toString()) {
-                    item(gruppe.toString()) {
-                        action {
-                            val view = find<GruppeDetailedView>(mapOf("phase" to gruppe, "saison" to saison))
-                            val stage = view.openWindow(resizable = false)
-                            view.stage = stage
+            menubar {
+                for (gruppe in Phase.values().filter { it.bevor(Phase.ACHTELFINALE) }) {
+                    menu(gruppe.toString()) {
+                        item(gruppe.toString()) {
+                            action {
+                                val view = find<GruppeDetailedView>(mapOf("phase" to gruppe, "saison" to saison))
+                                val stage = view.openWindow(resizable = false)
+                                view.stage = stage
+                            }
                         }
-                    }
 
-                    setOnShown {
-                        items[0].fire()
+                        setOnShown {
+                            items[0].fire()
+                        }
                     }
                 }
             }
-        }
 
-        vbox {
-            useMaxSize = true
-            vgrow = Priority.ALWAYS
+            vbox {
+                useMaxSize = true
+                vgrow = Priority.ALWAYS
 
-            runAsyncWithOverlay {
-                buildTurnierbaum(saison) {
-                    alignment = Pos.CENTER
-                    useMaxSize = true
-                }
-            } ui { turnierbaum ->
-                vbox {
-                    useMaxSize = true
-                    alignment = Pos.TOP_CENTER
-
-                    label("Turnierbaum") {
-                        useMaxWidth = true
+                runAsyncWithOverlay {
+                    buildTurnierbaum(saison) {
                         alignment = Pos.CENTER
-                        font = Font.font(font.family, FontWeight.BOLD, 30.0)
+                        useMaxSize = true
                     }
+                } ui { turnierbaum ->
+                    vbox {
+                        useMaxSize = true
+                        alignment = Pos.TOP_CENTER
 
-                    hbox {
-                        alignment = Pos.CENTER
-                        label("Saison:  ")
+                        label("Turnierbaum") {
+                            useMaxWidth = true
+                            alignment = Pos.CENTER
+                            font = Font.font(font.family, FontWeight.BOLD, 30.0)
+                        }
 
-                        combobox(saisonProptery, jahre) {
-                            cellFormat {
-                                text = "${item.toInt() - 1}/$item"
+                        hbox {
+                            alignment = Pos.CENTER
+                            label("Saison:  ")
+
+                            combobox(saisonProptery, jahre) {
+                                cellFormat {
+                                    text = "${item.toInt() - 1}/$item"
+                                }
                             }
                         }
                     }
-                }
 
-                add(turnierbaum)
+                    add(turnierbaum)
+                }
             }
         }
     }
@@ -103,6 +106,7 @@ class TurnierbaumView : Fragment() {
             this.replaceWith(turnierbaumNeu, ViewTransition.Fade(15.millis))
         }
     }
+
 
     /**
      * Gibt die aktuelle Saison zurück. Stichtag ist der 1. September, da dann die Auslosung der Gruppenphase bereits
