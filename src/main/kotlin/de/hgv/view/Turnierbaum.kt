@@ -8,15 +8,8 @@ import javafx.geometry.Pos
 import javafx.scene.Cursor
 import javafx.scene.image.Image
 import javafx.scene.layout.GridPane
-import tornadofx.find
-import tornadofx.gridpane
-import tornadofx.gridpaneConstraints
-import tornadofx.imageview
-import tornadofx.label
-import tornadofx.onHover
-import tornadofx.row
-import tornadofx.tooltip
-import tornadofx.vbox
+import tornadofx.*
+import java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment
 
 /**
  * Baut das UI des Turnierbaums.
@@ -146,8 +139,15 @@ private fun GridPane.buildSpiel(paarung: List<Spiel>?, index: Int, wappen: Map<V
     val daheim = paarung?.get(index)?.daheim ?: Verein.UNBEKANNT
     val auswaerts = paarung?.get(index)?.auswaerts ?: Verein.UNBEKANNT
 
+    val wappenGroesse = if (getLocalGraphicsEnvironment().maximumWindowBounds.height -116-50*14 <0) {
+        (getLocalGraphicsEnvironment().maximumWindowBounds.height - 116)/14.0
+    }
+    else {
+        50.0
+    }
+
     imageview(wappen.getValue(daheim)) {
-        fitWidth = 50.0
+        fitWidth = wappenGroesse
         isPreserveRatio = true
         isSmooth = true
 
@@ -161,7 +161,7 @@ private fun GridPane.buildSpiel(paarung: List<Spiel>?, index: Int, wappen: Map<V
     label(paarung?.get(index)?.toreAuswaerts.toString())
 
     imageview(wappen.getValue(auswaerts)) {
-        fitWidth = 50.0
+        fitWidth = wappenGroesse
         isPreserveRatio = true
         isSmooth = true
 
