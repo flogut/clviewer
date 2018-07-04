@@ -11,7 +11,7 @@ import org.jsoup.nodes.Element
 import java.net.URL
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Locale
+import java.util.*
 
 /**
  * Der ParsingProvider lädt die benötigten Daten von einer Website herunter und parst sie dann.
@@ -41,7 +41,7 @@ open class ParsingProvider : Provider {
         // In der Saison 2010/11 ist hinter steht hinter 2011 noch "_3"
         val url =
             "http://www.weltfussball.de/alle_spiele/champions-league-${saison - 1}-$saison" +
-                    (if (saison == 2011) "_3" else "") + "/"
+                    (if (saison == 2011) "_3" else if (saison == 2009) "_2" else "") + "/"
 
         val doc =
             Jsoup.parse(URL(url), 5000)
