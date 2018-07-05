@@ -55,13 +55,13 @@ internal class SpielerProviderTest {
 
             @Test
             fun `Unvollständige Daten`() {
-                val spieler = Spieler("Giannis Andreou", "giannis-andreou_2")
+                val spieler = Spieler("Christos Kallis", "christos-kallis")
                 val details = Spieler.Details(
                     verein = Verein("APOEL Nikosia", "apoel-nikosia"),
                     positionen = emptyList(),
-                    nummer = 34,
+                    nummer = null,
                     land = "Zypern",
-                    geburtstag = LocalDate.of(2000, 1, 4),
+                    geburtstag = LocalDate.of(1998, 4, 7),
                     groesse = null,
                     spielfuss = null,
                     portraitUrl = null
