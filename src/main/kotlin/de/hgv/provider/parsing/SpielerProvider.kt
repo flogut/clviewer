@@ -52,14 +52,14 @@ class SpielerProvider {
 
         val vereinName =
             doc.selectFirst("table.standard_tabelle > tbody > tr:contains(#) > td:eq(1) > a")
-                ?.text() ?: return null
+                ?.text()
 
         val vereinId =
             doc.selectFirst("table.standard_tabelle > tbody > tr:contains(#) > td:eq(1) > a")
                 ?.attr("href")
-                ?.removeSurrounding("/teams/", "/") ?: return null
+                ?.removeSurrounding("/teams/", "/")
 
-        val verein = Verein(vereinName, vereinId)
+        val verein = if (vereinName != null && vereinId != null) Verein(vereinName, vereinId) else Verein.UNBEKANNT
 
         val portraitUrl = doc.selectFirst("div.data[itemprop=image] > img")?.attr("src")
 

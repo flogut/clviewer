@@ -11,12 +11,12 @@ import javafx.scene.layout.GridPane
 import tornadofx.*
 import java.awt.GraphicsEnvironment
 
-private val wappenGroesse = if (GraphicsEnvironment.getLocalGraphicsEnvironment().maximumWindowBounds.height -116-50*14 <0) {
-    (GraphicsEnvironment.getLocalGraphicsEnvironment().maximumWindowBounds.height - 116)/14
-}
-else {
-    50
-}
+private val wappenGroesse =
+    if (GraphicsEnvironment.getLocalGraphicsEnvironment().maximumWindowBounds.height - 116 - 50 * 14 < 0) {
+        (GraphicsEnvironment.getLocalGraphicsEnvironment().maximumWindowBounds.height - 116) / 14
+    } else {
+        50
+    }
 
 /**
  * Baut das UI des Turnierbaums.
@@ -39,19 +39,25 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
                 buildSpiel(paarung, 0, wappen)
                 buildSpiel(paarung, 1, wappen)
 
-                setOnMouseClicked {
-                    val spiel = if (it.y < wappenGroesse) {
-                        paarung?.get(0)
-                    } else {
-                        paarung?.get(1)
+                if (paarung != null) {
+                    setOnMouseClicked {
+                        val spiel = if (it.y < wappenGroesse) {
+                            paarung[0]
+                        } else {
+                            paarung[1]
+                        }
+                        val view = find<SpielView>(params = mapOf("spiel" to spiel))
+                        val stage = view.openWindow(resizable = false)
+                        view.stage = stage
                     }
-                    val view = find<SpielView>(params = mapOf("spiel" to spiel))
-                    val stage = view.openWindow(resizable = false)
-                    view.stage = stage
-                }
 
-                onHover { hovering ->
-                    cursor = if (hovering) { Cursor.HAND } else { Cursor.DEFAULT }
+                    onHover { hovering ->
+                        cursor = if (hovering) {
+                            Cursor.HAND
+                        } else {
+                            Cursor.DEFAULT
+                        }
+                    }
                 }
             }
             gridpaneConstraints {
@@ -70,19 +76,25 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
                 buildSpiel(paarung, 0, wappen)
                 buildSpiel(paarung, 1, wappen)
 
-                setOnMouseClicked {
-                    val spiel = if (it.y < wappenGroesse) {
-                        paarung?.get(0)
-                    } else {
-                        paarung?.get(1)
+                if (paarung != null) {
+                    setOnMouseClicked {
+                        val spiel = if (it.y < wappenGroesse) {
+                            paarung[0]
+                        } else {
+                            paarung[1]
+                        }
+                        val view = find<SpielView>(params = mapOf("spiel" to spiel))
+                        val stage = view.openWindow(resizable = false)
+                        view.stage = stage
                     }
-                    val view = find<SpielView>(params = mapOf("spiel" to spiel))
-                    val stage = view.openWindow(resizable = false)
-                    view.stage = stage
-                }
 
-                onHover { hovering ->
-                    cursor = if (hovering) { Cursor.HAND } else { Cursor.DEFAULT }
+                    onHover { hovering ->
+                        cursor = if (hovering) {
+                            Cursor.HAND
+                        } else {
+                            Cursor.DEFAULT
+                        }
+                    }
                 }
             }
             gridpaneConstraints {
@@ -101,19 +113,25 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
                 buildSpiel(paarung, 0, wappen)
                 buildSpiel(paarung, 1, wappen)
 
-                setOnMouseClicked {
-                    val spiel = if (it.y < wappenGroesse) {
-                        paarung?.get(0)
-                    } else {
-                        paarung?.get(1)
+                if (paarung != null) {
+                    setOnMouseClicked {
+                        val spiel = if (it.y < wappenGroesse) {
+                            paarung[0]
+                        } else {
+                            paarung[1]
+                        }
+                        val view = find<SpielView>(params = mapOf("spiel" to spiel))
+                        val stage = view.openWindow(resizable = false)
+                        view.stage = stage
                     }
-                    val view = find<SpielView>(params = mapOf("spiel" to spiel))
-                    val stage = view.openWindow(resizable = false)
-                    view.stage = stage
-                }
 
-                onHover { hovering ->
-                    cursor = if (hovering) { Cursor.HAND } else { Cursor.DEFAULT }
+                    onHover { hovering ->
+                        cursor = if (hovering) {
+                            Cursor.HAND
+                        } else {
+                            Cursor.DEFAULT
+                        }
+                    }
                 }
             }
             gridpaneConstraints {
@@ -126,17 +144,24 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
     vbox {
         gridpane {
             hgap = 10.0
-            buildSpiel(turnier[Phase.FINALE]?.get(0), 0, wappen)
+            val paarung = turnier[Phase.FINALE]
+            buildSpiel(paarung?.get(0), 0, wappen)
 
-            setOnMouseClicked {
-                val spiel = turnier[Phase.FINALE]?.get(0)?.get(0)
-                val view = find<SpielView>(params = mapOf("spiel" to spiel))
-                val stage = view.openWindow(resizable = false)
-                view.stage = stage
-            }
+            if (paarung != null) {
+                setOnMouseClicked {
+                    val spiel = paarung[0][0]
+                    val view = find<SpielView>(params = mapOf("spiel" to spiel))
+                    val stage = view.openWindow(resizable = false)
+                    view.stage = stage
+                }
 
-            onHover { hovering ->
-                cursor = if (hovering) { Cursor.HAND } else { Cursor.DEFAULT }
+                onHover { hovering ->
+                    cursor = if (hovering) {
+                        Cursor.HAND
+                    } else {
+                        Cursor.DEFAULT
+                    }
+                }
             }
         }
         gridpaneConstraints {
@@ -166,15 +191,15 @@ private fun GridPane.buildSpiel(paarung: List<Spiel>?, index: Int, wappen: Map<V
         tooltip(daheim.name)
     }
 
-    label(paarung?.get(index)?.toreHeim.toString()){
+    label(paarung?.get(index)?.toreHeim?.toString() ?: "?") {
         textFill = c("#FFFFFF")
     }
 
-    label(":"){
+    label(":") {
         textFill = c("#FFFFFF")
     }
 
-    label(paarung?.get(index)?.toreAuswaerts.toString()){
+    label(paarung?.get(index)?.toreAuswaerts?.toString() ?: "?") {
         textFill = c("#FFFFFF")
     }
 

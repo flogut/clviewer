@@ -51,7 +51,8 @@ object Download {
         vereine.distinct()
             .map { verein -> verein to async { downloadWappen(verein) } }
             .map { (verein, job) -> verein to job.await() }
-            .toMap()
+            .toMap().toMutableMap()
+            .apply { set(Verein.UNBEKANNT, downloadWappen(Verein.UNBEKANNT)) }
     }
 
     /**
@@ -60,7 +61,7 @@ object Download {
      */
     fun downloadWappen(verein: Verein?): Image {
         if (verein == null || verein == Verein.UNBEKANNT) {
-            TODO("Eigenes Wappen zurückgeben")
+            return Image(Download.javaClass.getResourceAsStream("/resources/wappen/unbekannt.png"))
         }
 
         if (isCached(verein)) {
