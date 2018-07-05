@@ -7,7 +7,7 @@ import org.jsoup.select.Elements
 import java.net.URL
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Locale
+import java.util.*
 
 /**
  * @author Florian Gutekunst
@@ -31,7 +31,7 @@ class SpielerProvider {
         val geburtstag =
             getTextFromTable(rows, "geboren am:")?.let { LocalDate.parse(it, dateTimeFormatter) }
 
-        val land = getTextFromTable(rows, "Nationalität:")?.split(" ")?.firstOrNull()
+        val land = getLand(rows)
 
         val groesse = getTextFromTable(rows, "Größe:")?.removeSuffix(" cm")?.toIntOrNull()
 
@@ -77,6 +77,17 @@ class SpielerProvider {
      * @return Die Details, oder null, wenn ein Fehler auftritt
      */
     fun getDetailsForSpieler(spieler: Spieler): Spieler.Details? = getSpieler(spieler.id)?.details
+
+    /**
+     * Parst die (Haupt-)Nation des Spielers.
+     * @param rows Tablle, die die Daten des Spielers enthält
+     */
+    private fun getLand(rows: Elements) =
+        rows.select("tr:contains(Nationalität)")
+            .firstOrNull()?.select("td")
+            ?.get(1)
+            ?.selectFirst("span")
+            ?.text()
 
     /**
      * Es wird eine aus zwei Spalten bestehende Tabelle mit den Zeilen rows übergegeben.

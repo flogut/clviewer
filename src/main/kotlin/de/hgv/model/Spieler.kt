@@ -30,7 +30,19 @@ data class Spieler(
         val groesse: Int?,
         val spielfuss: String?,
         val portraitUrl: String?
-    )
+    ) {
+
+        fun getLandForLink(): String? =
+            if (land.equals("USA", true)) {
+                "vereinigte-staaten-von-amerika-usa"
+            } else {
+                land?.toLowerCase()
+                    ?.replace(" ", "-")
+                    ?.replace("ü", "ue")
+                    ?.replace("ä", "ae")
+                    ?.replace("ö", "oe")
+            }
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

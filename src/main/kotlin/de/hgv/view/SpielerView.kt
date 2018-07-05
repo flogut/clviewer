@@ -10,20 +10,9 @@ import javafx.scene.text.Font
 import javafx.scene.text.TextAlignment
 import javafx.stage.Stage
 import kotlinx.coroutines.experimental.runBlocking
-import tornadofx.Fragment
-import tornadofx.error
-import tornadofx.gridpane
-import tornadofx.gridpaneConstraints
-import tornadofx.imageview
-import tornadofx.label
-import tornadofx.paddingLeft
-import tornadofx.runAsyncWithOverlay
-import tornadofx.runLater
-import tornadofx.scrollpane
-import tornadofx.tooltip
-import tornadofx.useMaxWidth
-import tornadofx.vbox
+import tornadofx.*
 import java.time.format.DateTimeFormatter
+import kotlin.collections.set
 
 /**
  * Stellt die Details zu einem Spieler dar. Der Spielers wird über die params von TornadoFX übergeben mit dem
@@ -41,31 +30,32 @@ class SpielerView: Fragment() {
             vbox(alignment = Pos.TOP_CENTER) {
                 runAsyncWithOverlay {
                     if (spieler.details == null) {
-                        return@runAsyncWithOverlay listOf<Image>()
+                        return@runAsyncWithOverlay mutableMapOf<String, Image>()
                     }
 
                     // Download der Wappen während ein Ladekreis angezeigt wird => Gibt eine Map von Verein zu Wappen zurück
                     val urls = listOf(
-                        "http://www.nationalflaggen.de/media/flags/flagge-${spieler.details?.land?.toLowerCase()}.gif",
-                        spieler.details?.portraitUrl
+                        "flagge" to "http://www.nationalflaggen.de/media/flags/flagge-${spieler.details?.getLandForLink()}.gif",
+                        "portrait" to spieler.details?.portraitUrl
                     )
 
                     val bilder = runBlocking {
-                        urls.map { Download.downloadAsync(it) }
-                            .map { it.await() }
-                            // TODO NPE abfangen => Nicht-gefunden Bild anzeigen, wenn der InputStream null ist
-                            .map { Image(it) }
-                            .toMutableList()
+                        urls.map { it.first to Download.downloadAsync(it.second) }
+                            .map { it.first to it.second.await() }
+                            .filter { it.second != null }
+                            .map { it.first to Image(it.second) }
+                            .toMap().toMutableMap()
                     }
 
-                    bilder.add(0, Download.downloadWappen(spieler.details?.verein))
+                    bilder["wappen"] = Download.downloadWappen(spieler.details?.verein)
 
                     bilder
                 } ui { bilder ->
                     if (spieler.details == null) {
                         error(
                             "Informationen zum Spieler konnten nicht geladen werden",
-                            "Detaillierte Informationen sind nicht verfügbar."
+                            "Detaillierte Informationen sind nicht verfügbar. Dieser hat vermutlich seine Karriere " +
+                                    "beendet oder ist momentan vertragslos."
                         )
 
                         runLater {
@@ -76,40 +66,60 @@ class SpielerView: Fragment() {
                             alignment = Pos.TOP_CENTER
 
                             // Vereinswappen
-                            imageview(bilder[0]) {
-                                useMaxWidth = true
-                                fitHeight = 100.0
-                                isPreserveRatio = true
-                                isSmooth = true
-                                alignment = Pos.CENTER
+                            if (bilder["wappen"] != null) {
+                                imageview(bilder.getValue("wappen")) {
+                                    useMaxWidth = true
+                                    fitHeight = 100.0
+                                    isPreserveRatio = true
+                                    isSmooth = true
+                                    alignment = Pos.CENTER
 
-                                tooltip(spieler.details?.verein?.name)
+                                    tooltip(spieler.details?.verein?.name)
 
-                                gridpaneConstraints {
-                                    columnRowIndex(0, 0)
-                                    hAlignment = HPos.CENTER
-                                    vAlignment = VPos.CENTER
+                                    gridpaneConstraints {
+                                        columnRowIndex(0, 0)
+                                        hAlignment = HPos.CENTER
+                                        vAlignment = VPos.CENTER
+                                    }
+                                }
+                            } else {
+                                label(spieler.details?.verein?.name.orEmpty()) {
+                                    gridpaneConstraints {
+                                        columnRowIndex(0, 0)
+                                        hAlignment = HPos.CENTER
+                                        vAlignment = VPos.CENTER
+                                    }
                                 }
                             }
 
                             // Flagge
-                            imageview(bilder[1]) {
-                                useMaxWidth = true
-                                fitHeight = 100.0
-                                isPreserveRatio = true
-                                isSmooth = true
+                            if (bilder["flagge"] != null) {
+                                imageview(bilder.getValue("flagge")) {
+                                    useMaxWidth = true
+                                    fitHeight = 100.0
+                                    isPreserveRatio = true
+                                    isSmooth = true
 
-                                tooltip(spieler.details?.land)
+                                    tooltip(spieler.details?.land)
 
-                                gridpaneConstraints {
-                                    columnRowIndex(0, 1)
-                                    vAlignment = VPos.CENTER
-                                    hAlignment = HPos.CENTER
+                                    gridpaneConstraints {
+                                        columnRowIndex(0, 1)
+                                        vAlignment = VPos.CENTER
+                                        hAlignment = HPos.CENTER
+                                    }
+                                }
+                            } else {
+                                label(spieler.details?.land.orEmpty()) {
+                                    gridpaneConstraints {
+                                        columnRowIndex(0, 1)
+                                        vAlignment = VPos.CENTER
+                                        hAlignment = HPos.CENTER
+                                    }
                                 }
                             }
 
                             // Rückennummer
-                            label("#${spieler.details?.nummer}") {
+                            label(spieler.details?.nummer?.let { "#$it" }.orEmpty()) {
                                 font = Font(50.0)
                                 textAlignment = TextAlignment.CENTER
 
@@ -121,7 +131,7 @@ class SpielerView: Fragment() {
                             }
 
                             // Spieler-Portrait
-                            imageview(bilder[2]) {
+                            imageview(bilder.getValue("portrait")) {
                                 fitHeight = 400.0
                                 isPreserveRatio = true
                                 isSmooth = true

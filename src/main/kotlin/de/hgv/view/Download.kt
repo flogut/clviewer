@@ -7,7 +7,6 @@ import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.runBlocking
 import java.io.File
 import java.io.InputStream
-import java.net.MalformedURLException
 import java.net.URL
 
 /**
@@ -40,7 +39,7 @@ object Download {
         )
 
         connection.getInputStream()
-    } catch (e: MalformedURLException) {
+    } catch (e: Exception) {
         null
     }
 
