@@ -14,12 +14,14 @@ import java.time.LocalDate
  *
  * @author Tobias Döttling
  */
-class TurnierbaumView: Fragment() {
+class TurnierbaumView : Fragment() {
     val saison = params["saison"] as? Int ?: aktuelleSaison()
     private val saisonProptery = SimpleIntegerProperty(saison)
     private val jahre = (aktuelleSaison() downTo 2004).toList().observable()
 
     override val root = vbox {
+
+        style += "-fx-background-image: url(\"/resources/background-image.jpg\"); -fx-background-size: cover;"
         useMaxSize = true
 
         menubar {
@@ -58,13 +60,16 @@ class TurnierbaumView: Fragment() {
                         useMaxWidth = true
                         alignment = Pos.CENTER
                         font = Font.font(font.family, FontWeight.BOLD, 30.0)
+                        textFill = c("#FFFFFF")
                     }
 
                     hbox {
                         alignment = Pos.CENTER
-                        label("Saison:  ")
+                        label("Saison:  "){
+                            textFill = c("#FFFFFF")
+                        }
 
-                        combobox(saisonProptery, jahre) {
+                        combobox(saisonProptery, jahre){
                             cellFormat {
                                 text = "${item.toInt() - 1}/$item"
                             }
@@ -75,6 +80,7 @@ class TurnierbaumView: Fragment() {
                 add(turnierbaum)
             }
         }
+
     }
 
     init {
@@ -84,9 +90,10 @@ class TurnierbaumView: Fragment() {
 
         saisonProptery.onChange { neu ->
             val turnierbaumNeu = find<TurnierbaumView>(mapOf("saison" to neu))
-            this.replaceWith(turnierbaumNeu, ViewTransition.Fade(15.millis))
+            this.replaceWith(turnierbaumNeu, ViewTransition.Fade(1000.millis))
         }
     }
+
 
     /**
      * Gibt die aktuelle Saison zurück. Stichtag ist der 1. September, da dann die Auslosung der Gruppenphase bereits

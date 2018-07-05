@@ -9,7 +9,14 @@ import javafx.scene.Cursor
 import javafx.scene.image.Image
 import javafx.scene.layout.GridPane
 import tornadofx.*
-import java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment
+import java.awt.GraphicsEnvironment
+
+private val wappenGroesse = if (GraphicsEnvironment.getLocalGraphicsEnvironment().maximumWindowBounds.height -116-50*14 <0) {
+    (GraphicsEnvironment.getLocalGraphicsEnvironment().maximumWindowBounds.height - 116)/14
+}
+else {
+    50
+}
 
 /**
  * Baut das UI des Turnierbaums.
@@ -18,9 +25,9 @@ import java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment
 fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane().apply {
     hgap = 20.0
 
-    val turnier = KoSpiele(saison).getTurnierbaum()
-    val vereine = turnier[Phase.ACHTELFINALE].orEmpty().flatMap { it.map { it.daheim } }.distinct()
-    val wappen = Download.downloadWappen(vereine)
+    val turnier: Map<Phase, List<List<Spiel>>> = KoSpiele(saison).getTurnierbaum()
+    val vereine: List<Verein> = turnier[Phase.ACHTELFINALE].orEmpty().flatMap { it.map { it.daheim } }.distinct()
+    val wappen: Map<Verein, Image> = Download.downloadWappen(vereine)
 
     // Achtelfinalspiele:
     for (i: Int in 0..7) {
@@ -33,7 +40,11 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
                 buildSpiel(paarung, 1, wappen)
 
                 setOnMouseClicked {
-                    val spiel = if (it.y < 50) { paarung?.get(0) } else { paarung?.get(1) }
+                    val spiel = if (it.y < wappenGroesse) {
+                        paarung?.get(0)
+                    } else {
+                        paarung?.get(1)
+                    }
                     val view = find<SpielView>(params = mapOf("spiel" to spiel))
                     val stage = view.openWindow(resizable = false)
                     view.stage = stage
@@ -60,7 +71,11 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
                 buildSpiel(paarung, 1, wappen)
 
                 setOnMouseClicked {
-                    val spiel = if (it.y < 50) { paarung?.get(0) } else { paarung?.get(1) }
+                    val spiel = if (it.y < wappenGroesse) {
+                        paarung?.get(0)
+                    } else {
+                        paarung?.get(1)
+                    }
                     val view = find<SpielView>(params = mapOf("spiel" to spiel))
                     val stage = view.openWindow(resizable = false)
                     view.stage = stage
@@ -87,7 +102,11 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
                 buildSpiel(paarung, 1, wappen)
 
                 setOnMouseClicked {
-                    val spiel = if (it.y < 50) { paarung?.get(0) } else { paarung?.get(1) }
+                    val spiel = if (it.y < wappenGroesse) {
+                        paarung?.get(0)
+                    } else {
+                        paarung?.get(1)
+                    }
                     val view = find<SpielView>(params = mapOf("spiel" to spiel))
                     val stage = view.openWindow(resizable = false)
                     view.stage = stage
@@ -139,29 +158,28 @@ private fun GridPane.buildSpiel(paarung: List<Spiel>?, index: Int, wappen: Map<V
     val daheim = paarung?.get(index)?.daheim ?: Verein.UNBEKANNT
     val auswaerts = paarung?.get(index)?.auswaerts ?: Verein.UNBEKANNT
 
-    val wappenGroesse = if (getLocalGraphicsEnvironment().maximumWindowBounds.height -116-50*14 <0) {
-        (getLocalGraphicsEnvironment().maximumWindowBounds.height - 116)/14.0
-    }
-    else {
-        50.0
-    }
-
     imageview(wappen.getValue(daheim)) {
-        fitWidth = wappenGroesse
+        fitWidth = wappenGroesse.toDouble()
         isPreserveRatio = true
         isSmooth = true
 
         tooltip(daheim.name)
     }
 
-    label(paarung?.get(index)?.toreHeim.toString())
+    label(paarung?.get(index)?.toreHeim.toString()){
+        textFill = c("#FFFFFF")
+    }
 
-    label(":")
+    label(":"){
+        textFill = c("#FFFFFF")
+    }
 
-    label(paarung?.get(index)?.toreAuswaerts.toString())
+    label(paarung?.get(index)?.toreAuswaerts.toString()){
+        textFill = c("#FFFFFF")
+    }
 
     imageview(wappen.getValue(auswaerts)) {
-        fitWidth = wappenGroesse
+        fitWidth = wappenGroesse.toDouble()
         isPreserveRatio = true
         isSmooth = true
 
