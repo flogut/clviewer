@@ -73,7 +73,8 @@ object Download {
             return Image(Download.javaClass.getResourceAsStream("/resources/wappen/inter.png"))
         }
 
-        val inputStream = download(verein.wappenURL) ?: throw Exception("Wappen konnte nicht heruntergeladen werden")
+        val inputStream =
+            download(verein.wappenURL) ?: throw IllegalStateException("Wappen konnte nicht heruntergeladen werden")
 
         val bytes = inputStream.readBytes()
 

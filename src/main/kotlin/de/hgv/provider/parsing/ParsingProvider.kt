@@ -70,8 +70,9 @@ open class ParsingProvider : Provider {
             val ergebnis = ergebnisText.substringBefore(" ").split(":")
             val toreHeim = ergebnis[0].toIntOrNull()
             val toreAuswaerts = ergebnis[1].toIntOrNull()
-            val verlaengerung= if (toreHeim != null && toreAuswaerts != null) ergebnisText.endsWith("n.V.") else null
-            val elfmeterschiessen = if (toreHeim != null && toreAuswaerts != null) ergebnisText.endsWith("i.E.") else null
+            val verlaengerung = if (toreHeim != null && toreAuswaerts != null) ergebnisText.endsWith("n.V.") else null
+            val elfmeterschiessen =
+                if (toreHeim != null && toreAuswaerts != null) ergebnisText.endsWith("i.E.") else null
 
             val phase = Phase.getValue(phaseString)
 

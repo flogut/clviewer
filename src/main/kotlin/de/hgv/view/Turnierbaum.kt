@@ -26,7 +26,8 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
     hgap = 20.0
 
     val turnier: Map<Phase, List<List<Spiel>>> = KoSpiele(saison).getTurnierbaum()
-    val vereine: List<Verein> = turnier[Phase.ACHTELFINALE].orEmpty().flatMap { it.map { it.daheim } + it.map {it.auswaerts}}.distinct()
+    val vereine: List<Verein> =
+        turnier[Phase.ACHTELFINALE].orEmpty().flatMap { it.map { it.daheim } + it.map { it.auswaerts } }.distinct()
     val wappen: Map<Verein, Image> = Download.downloadWappen(vereine)
 
     // Achtelfinalspiele:

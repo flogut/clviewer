@@ -65,11 +65,11 @@ class TurnierbaumView : Fragment() {
 
                     hbox {
                         alignment = Pos.CENTER
-                        label("Saison:  "){
+                        label("Saison:  ") {
                             textFill = c("#FFFFFF")
                         }
 
-                        combobox(saisonProptery, jahre){
+                        combobox(saisonProptery, jahre) {
                             cellFormat {
                                 text = "${item.toInt() - 1}/$item"
                             }
@@ -80,7 +80,6 @@ class TurnierbaumView : Fragment() {
                 add(turnierbaum)
             }
         }
-
     }
 
     init {
@@ -93,7 +92,6 @@ class TurnierbaumView : Fragment() {
             this.replaceWith(turnierbaumNeu, ViewTransition.Fade(1000.millis))
         }
     }
-
 
     /**
      * Gibt die aktuelle Saison zurück. Stichtag ist der 1. September, da dann die Auslosung der Gruppenphase bereits

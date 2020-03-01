@@ -32,6 +32,9 @@ data class Spieler(
         val portraitUrl: String?
     ) {
 
+        /**
+         * @return Für Links escaptes Land des Spielers
+         */
         fun getLandForLink(): String? =
             if (land.equals("USA", true)) {
                 "vereinigte-staaten-von-amerika-usa"
@@ -53,5 +56,11 @@ data class Spieler(
         if (id != other.id) return false
 
         return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + id.hashCode()
+        return result
     }
 }

@@ -9,22 +9,7 @@ import javafx.scene.text.Font
 import javafx.scene.text.FontWeight
 import javafx.scene.text.TextAlignment
 import javafx.stage.Stage
-import tornadofx.Fragment
-import tornadofx.gridpane
-import tornadofx.gridpaneConstraints
-import tornadofx.imageview
-import tornadofx.label
-import tornadofx.onHover
-import tornadofx.paddingLeft
-import tornadofx.paddingRight
-import tornadofx.row
-import tornadofx.runAsyncWithOverlay
-import tornadofx.runLater
-import tornadofx.scrollpane
-import tornadofx.useMaxSize
-import tornadofx.useMaxWidth
-import tornadofx.vbox
-import tornadofx.vgrow
+import tornadofx.*
 
 /**
  * Stellt die zu einer Gruppe die Tabelle und die Spiele (sortiert nach Datum) einer Saison dar. Die Gruppe und die

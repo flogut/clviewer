@@ -1,7 +1,11 @@
 package de.hgv.view
 
+import de.hgv.model.Auswechslung
+import de.hgv.model.Karte
 import de.hgv.model.Kartenart
 import de.hgv.model.Spiel
+import de.hgv.model.Spieler
+import de.hgv.model.Tor
 import javafx.geometry.Pos
 import javafx.scene.Cursor
 import javafx.scene.layout.Priority
@@ -9,23 +13,11 @@ import javafx.scene.layout.VBox
 import javafx.scene.text.Font
 import javafx.scene.text.FontWeight
 import javafx.stage.Stage
-import tornadofx.Fragment
-import tornadofx.gridpane
-import tornadofx.gridpaneColumnConstraints
-import tornadofx.hbox
-import tornadofx.hgrow
-import tornadofx.imageview
-import tornadofx.label
-import tornadofx.onHover
-import tornadofx.pane
-import tornadofx.row
-import tornadofx.runAsyncWithOverlay
-import tornadofx.runLater
-import tornadofx.scrollpane
-import tornadofx.tooltip
-import tornadofx.useMaxWidth
-import tornadofx.vbox
+import tornadofx.*
 import java.time.format.DateTimeFormatter
+
+private const val PIC_HEIGHT = 15.0
+private const val FONT_SIZE = 15.0
 
 /**
  * Stellt die Details zu einem Spiel dar. Das Spiel wird über die params von TornadoFX mit dem Key "spiel" übergeben.
@@ -149,171 +141,123 @@ class SpielView : Fragment() {
         val tore = spiel.tore
         val pos = if (team == Team.HEIM) Pos.TOP_LEFT else Pos.TOP_RIGHT
 
-        val picHeight = 15.0
-        val fontSize = 15.0
-
         val liste = VBox().apply {
             alignment = pos
             useMaxWidth = true
 
             // Startelf
             for (spieler in startelf) {
-                hbox(alignment = Pos.CENTER_LEFT, spacing = 5.0) {
-                    hgrow = Priority.ALWAYS
-
-                    // Name
-                    label(spieler.name.trim()) {
-                        font = Font.font(fontSize)
-
-                        onHover { hovering ->
-                            cursor = if (hovering) {
-                                Cursor.HAND
-                            } else {
-                                Cursor.DEFAULT
-                            }
-                        }
-
-                        // Öffnet das Fenster mit den Details zu dem Spieler
-                        setOnMouseClicked {
-                            val view = tornadofx.find<SpielerView>(params = mapOf("spieler" to spieler))
-                            val stage = view.openWindow(resizable = false)
-                            view.stage = stage
-                        }
-                    }
-
-                    // Zeigt Karten des Spielers an
-                    if (karten.any { it.spieler == spieler }) {
-                        val karte = karten.findLast { it.spieler == spieler }!!
-                        val image = when (karte.art) {
-                            Kartenart.GELB -> resources.image("/resources/karte-gelb.png")
-                            Kartenart.ROT -> resources.image("/resources/karte-rot.png")
-                            Kartenart.GELBROT -> resources.image("/resources/karte-gelbrot.png")
-                        }
-
-                        imageview(image) {
-                            fitHeight = picHeight
-                            isSmooth = true
-                            isPreserveRatio = true
-
-                            tooltip(karte.spielminute.toString() + "'")
-                        }
-                    }
-
-                    // Zeigt Tore des Spielers an
-                    if (tore.any { it.torschuetze == spieler }) {
-                        for (tor in tore.filter { it.torschuetze == spieler }) {
-                            val image = when {
-                                tor.eigentor -> resources.image("/resources/ball-rot.png")
-                                tor.elfmeter -> resources.image("/resources/ball.png") // TODO Elfmeter kennzeichnen
-                                else -> resources.image("/resources/ball.png")
-                            }
-
-                            imageview(image) {
-                                fitHeight = picHeight
-                                isSmooth = true
-                                isPreserveRatio = true
-
-                                tooltip(tor.spielminute.toString() + "' " + (tor.vorlagengeber?.name?.let { " ($it)" }
-                                        ?: "") + if (tor.eigentor) "Eigentor" else "")
-                            }
-                        }
-                    }
-
-                    // Zeigt an, ob der Spieler ausgewechselt wurde
-                    if (auswechslungen.any { it.aus == spieler }) {
-                        val auswechslung = auswechslungen.find { it.aus == spieler }!!
-                        val pfeil = resources.image("/resources/pfeil-rot.png")
-
-                        imageview(pfeil) {
-                            fitHeight = picHeight
-                            isSmooth = true
-                            isPreserveRatio = true
-
-                            tooltip("${auswechslung.spielminute}' (${auswechslung.ein.name})")
-                        }
-                    }
-                }
+                buildSpieler(spieler, null, karten, tore, auswechslungen)
             }
 
             // Eingewechselte Spieler
             for (auswechslung in auswechslungen) {
-                hbox(alignment = Pos.CENTER_LEFT, spacing = 5.0) {
-                    hgrow = Priority.ALWAYS
-
-                    // Name
-                    label(auswechslung.ein.name.trim()) {
-                        font = Font.font(fontSize)
-
-                        onHover { hovering ->
-                            cursor = if (hovering) {
-                                Cursor.HAND
-                            } else {
-                                Cursor.DEFAULT
-                            }
-                        }
-
-                        // Öffnet ein Fenster mit den Details zu dem Spieler
-                        setOnMouseClicked {
-                            val view = tornadofx.find<SpielerView>(params = mapOf("spieler" to auswechslung.ein))
-                            val stage = view.openWindow(resizable = false)
-                            view.stage = stage
-                        }
-                    }
-
-                    // Zeigt den Einwechslungspfeil an
-                    val pfeil = resources.image("/resources/pfeil-gruen.png")
-                    imageview(pfeil) {
-                        fitHeight = picHeight
-                        isSmooth = true
-                        isPreserveRatio = true
-
-                        tooltip("${auswechslung.spielminute}' (${auswechslung.aus.name})")
-                    }
-
-                    // Zeigt Karten des Spielers an
-                    if (karten.any { it.spieler == auswechslung.ein }) {
-                        val karte = karten.findLast { it.spieler == auswechslung.ein }!!
-                        val image = when (karte.art) {
-                            Kartenart.GELB -> resources.image("/resources/karte-gelb.png")
-                            Kartenart.ROT -> resources.image("/resources/karte-rot.png")
-                            Kartenart.GELBROT -> resources.image("/resources/karte-gelbrot.png")
-                        }
-
-                        imageview(image) {
-                            fitHeight = picHeight
-                            isSmooth = true
-                            isPreserveRatio = true
-
-                            tooltip("${karte.spielminute}'")
-                        }
-                    }
-
-                    // Zeigt Tore des Spielers an
-                    if (tore.any { it.torschuetze == auswechslung.ein }) {
-                        for (tor in tore.filter { it.torschuetze == auswechslung.ein }) {
-                            val image = when {
-                                tor.eigentor -> resources.image("/resources/ball-rot.png")
-                                tor.elfmeter -> resources.image("/resources/ball.png") // TODO Elfmeter kennzeichnen
-                                else -> resources.image("/resources/ball.png")
-                            }
-
-                            imageview(image) {
-                                fitHeight = picHeight
-                                isSmooth = true
-                                isPreserveRatio = true
-
-                                tooltip(tor.spielminute.toString() + "' " + (tor.vorlagengeber?.name?.let { " ($it)" }
-                                        ?: "") + if (tor.eigentor) "Eigentor" else "")
-                            }
-                        }
-                    }
-                }
+                buildSpieler(auswechslung.ein, auswechslung, karten, tore, auswechslungen)
             }
         }
 
         op?.invoke(liste)
 
         return liste
+    }
+
+    /**
+     * @param einwechslung Einwechslung, mit der der Spieler aufs Feld kam, null wenn er in der Startelf stand
+     */
+    private fun VBox.buildSpieler(
+        spieler: Spieler,
+        einwechslung: Auswechslung?,
+        karten: List<Karte>,
+        tore: List<Tor>,
+        auswechslungen: List<Auswechslung>
+    ) {
+        hbox(alignment = Pos.CENTER_LEFT, spacing = 5.0) {
+            hgrow = Priority.ALWAYS
+
+            // Name
+            label(spieler.name.trim()) {
+                font = Font.font(FONT_SIZE)
+
+                onHover { hovering ->
+                    cursor = if (hovering) {
+                        Cursor.HAND
+                    } else {
+                        Cursor.DEFAULT
+                    }
+                }
+
+                // Öffnet das Fenster mit den Details zu dem Spieler
+                setOnMouseClicked {
+                    val view = tornadofx.find<SpielerView>(params = mapOf("spieler" to spieler))
+                    val stage = view.openWindow(resizable = false)
+                    view.stage = stage
+                }
+            }
+
+            // Zeigt den Einwechslungspfeil an
+            if (einwechslung != null) {
+                val pfeil = resources.image("/resources/pfeil-gruen.png")
+                imageview(pfeil) {
+                    fitHeight = PIC_HEIGHT
+                    isSmooth = true
+                    isPreserveRatio = true
+
+                    tooltip("${einwechslung.spielminute}' (${einwechslung.aus.name})")
+                }
+            }
+
+            // Zeigt Karten des Spielers an
+            if (karten.any { it.spieler == spieler }) {
+                val karte = karten.findLast { it.spieler == spieler }!!
+                val image = when (karte.art) {
+                    Kartenart.GELB -> resources.image("/resources/karte-gelb.png")
+                    Kartenart.ROT -> resources.image("/resources/karte-rot.png")
+                    Kartenart.GELBROT -> resources.image("/resources/karte-gelbrot.png")
+                }
+
+                imageview(image) {
+                    fitHeight = PIC_HEIGHT
+                    isSmooth = true
+                    isPreserveRatio = true
+
+                    tooltip(karte.spielminute.toString() + "'")
+                }
+            }
+
+            // Zeigt Tore des Spielers an
+            if (tore.any { it.torschuetze == spieler }) {
+                for (tor in tore.filter { it.torschuetze == spieler }) {
+                    val image = when {
+                        tor.eigentor -> resources.image("/resources/ball-rot.png")
+                        tor.elfmeter -> resources.image("/resources/ball.png") // TODO Elfmeter kennzeichnen
+                        else -> resources.image("/resources/ball.png")
+                    }
+
+                    imageview(image) {
+                        fitHeight = PIC_HEIGHT
+                        isSmooth = true
+                        isPreserveRatio = true
+
+                        tooltip(tor.spielminute.toString() + "' " + (tor.vorlagengeber?.name?.let { " ($it)" }
+                            ?: "") + if (tor.eigentor) "Eigentor" else "")
+                    }
+                }
+            }
+
+            // Zeigt an, ob der Spieler ausgewechselt wurde
+            if (auswechslungen.any { it.aus == spieler }) {
+                val auswechslung = auswechslungen.find { it.aus == spieler }!!
+                val pfeil = resources.image("/resources/pfeil-rot.png")
+
+                imageview(pfeil) {
+                    fitHeight = PIC_HEIGHT
+                    isSmooth = true
+                    isPreserveRatio = true
+
+                    tooltip("${auswechslung.spielminute}' (${auswechslung.ein.name})")
+                }
+            }
+        }
     }
 
     init {

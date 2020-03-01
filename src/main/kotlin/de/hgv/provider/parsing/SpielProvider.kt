@@ -60,7 +60,7 @@ class SpielProvider {
         val ergebnis = ergebnisString.substringBefore(" ").split(":")
         val toreHeim = ergebnis[0].toIntOrNull()
         val toreAuswaerts = ergebnis[1].toIntOrNull()
-        val verlaengerung= if (toreHeim != null && toreAuswaerts != null) ergebnisString.endsWith("n.V.") else null
+        val verlaengerung = if (toreHeim != null && toreAuswaerts != null) ergebnisString.endsWith("n.V.") else null
         val elfmeterschiessen = if (toreHeim != null && toreAuswaerts != null) ergebnisString.endsWith("i.E.") else null
 
         val phase = getPhase(doc) ?: return null
