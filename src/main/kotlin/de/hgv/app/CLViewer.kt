@@ -6,8 +6,7 @@ import javafx.animation.Timeline
 import javafx.application.Application
 import javafx.scene.control.Tooltip
 import javafx.stage.Stage
-import tornadofx.App
-import tornadofx.millis
+import tornadofx.*
 
 /**
  * Hauptklasse der Anwendung clviewer.

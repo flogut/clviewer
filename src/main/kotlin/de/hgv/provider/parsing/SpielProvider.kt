@@ -15,7 +15,7 @@ import org.jsoup.select.Elements
 import java.net.URL
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Locale
+import java.util.*
 
 /**
  * @author Florian Gutekunst
@@ -56,20 +56,12 @@ class SpielProvider {
 
         val datum = getDatum(rows) ?: return null
 
-        var ergebnisString = rows.getOrNull(1)?.selectFirst("td > .resultat")?.text() ?: return null
-        var verlaengerung = false
-        var elfmeterschiessen = false
-        if (ergebnisString.endsWith("n.V.")) {
-            verlaengerung = true
-            ergebnisString = ergebnisString.removeSuffix("n.V.").trim()
-        } else if (ergebnisString.endsWith("i.E.")) {
-            elfmeterschiessen = true
-            ergebnisString = ergebnisString.removeSuffix("i.E.").trim()
-        }
-
-        val ergebnis = ergebnisString.split(":")
-        val toreHeim = ergebnis[0].toIntOrNull() ?: return null
-        val toreAuswaerts = ergebnis[1].toIntOrNull() ?: return null
+        val ergebnisString = rows.getOrNull(1)?.selectFirst("td > .resultat")?.text() ?: return null
+        val ergebnis = ergebnisString.substringBefore(" ").split(":")
+        val toreHeim = ergebnis[0].toIntOrNull()
+        val toreAuswaerts = ergebnis[1].toIntOrNull()
+        val verlaengerung= if (toreHeim != null && toreAuswaerts != null) ergebnisString.endsWith("n.V.") else null
+        val elfmeterschiessen = if (toreHeim != null && toreAuswaerts != null) ergebnisString.endsWith("i.E.") else null
 
         val phase = getPhase(doc) ?: return null
 

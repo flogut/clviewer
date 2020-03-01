@@ -26,7 +26,7 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
     hgap = 20.0
 
     val turnier: Map<Phase, List<List<Spiel>>> = KoSpiele(saison).getTurnierbaum()
-    val vereine: List<Verein> = turnier[Phase.ACHTELFINALE].orEmpty().flatMap { it.map { it.daheim } }.distinct()
+    val vereine: List<Verein> = turnier[Phase.ACHTELFINALE].orEmpty().flatMap { it.map { it.daheim } + it.map {it.auswaerts}}.distinct()
     val wappen: Map<Verein, Image> = Download.downloadWappen(vereine)
 
     // Achtelfinalspiele:
@@ -36,8 +36,8 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
                 hgap = 10.0
                 val paarung = turnier[Phase.ACHTELFINALE]?.get(i)
 
-                buildSpiel(paarung, 0, wappen)
-                buildSpiel(paarung, 1, wappen)
+                buildSpiel(paarung?.getOrNull(0), wappen)
+                buildSpiel(paarung?.getOrNull(1), wappen)
 
                 if (paarung != null) {
                     setOnMouseClicked {
@@ -73,8 +73,8 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
                 hgap = 10.0
                 val paarung = turnier[Phase.VIERTELFINALE]?.get(i)
 
-                buildSpiel(paarung, 0, wappen)
-                buildSpiel(paarung, 1, wappen)
+                buildSpiel(paarung?.getOrNull(0), wappen)
+                buildSpiel(paarung?.getOrNull(1), wappen)
 
                 if (paarung != null) {
                     setOnMouseClicked {
@@ -110,8 +110,8 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
                 hgap = 10.0
                 val paarung = turnier[Phase.HALBFINALE]?.get(i)
 
-                buildSpiel(paarung, 0, wappen)
-                buildSpiel(paarung, 1, wappen)
+                buildSpiel(paarung?.getOrNull(0), wappen)
+                buildSpiel(paarung?.getOrNull(1), wappen)
 
                 if (paarung != null) {
                     setOnMouseClicked {
@@ -145,7 +145,7 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
         gridpane {
             hgap = 10.0
             val paarung = turnier[Phase.FINALE]
-            buildSpiel(paarung?.get(0), 0, wappen)
+            buildSpiel(paarung?.getOrNull(0)?.getOrNull(0), wappen)
 
             if (paarung != null) {
                 setOnMouseClicked {
@@ -175,13 +175,15 @@ fun buildTurnierbaum(saison: Int, op: (GridPane.() -> Unit)? = null) = GridPane(
 
 /**
  * Baut die Darstellung eines Spiels.
- * @param paarung Paarung, in der das Spiel ist
- * @param index Index des Spiels
+ * @param spiel Spiel, das angezeigt werden soll, null wenn das Spiel noch nicht ausgelost oder gespielt wurde
  * @param wappen Wappen der Vereine, die in den KO-Spielen vertreten sind
  */
-private fun GridPane.buildSpiel(paarung: List<Spiel>?, index: Int, wappen: Map<Verein, Image>) = row {
-    val daheim = paarung?.get(index)?.daheim ?: Verein.UNBEKANNT
-    val auswaerts = paarung?.get(index)?.auswaerts ?: Verein.UNBEKANNT
+private fun GridPane.buildSpiel(
+    spiel: Spiel?,
+    wappen: Map<Verein, Image>
+) = row {
+    val daheim = if (spiel?.daheim in wappen) spiel!!.daheim else Verein.UNBEKANNT
+    val auswaerts = if (spiel?.auswaerts in wappen) spiel!!.auswaerts else Verein.UNBEKANNT
 
     imageview(wappen.getValue(daheim)) {
         fitWidth = wappenGroesse.toDouble()
@@ -191,7 +193,7 @@ private fun GridPane.buildSpiel(paarung: List<Spiel>?, index: Int, wappen: Map<V
         tooltip(daheim.name)
     }
 
-    label(paarung?.get(index)?.toreHeim?.toString() ?: "?") {
+    label(spiel?.toreHeim?.toString() ?: "?") {
         textFill = c("#FFFFFF")
     }
 
@@ -199,7 +201,7 @@ private fun GridPane.buildSpiel(paarung: List<Spiel>?, index: Int, wappen: Map<V
         textFill = c("#FFFFFF")
     }
 
-    label(paarung?.get(index)?.toreAuswaerts?.toString() ?: "?") {
+    label(spiel?.toreAuswaerts?.toString() ?: "?") {
         textFill = c("#FFFFFF")
     }
 

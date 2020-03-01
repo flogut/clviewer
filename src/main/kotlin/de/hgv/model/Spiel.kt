@@ -5,15 +5,19 @@ import java.time.LocalDate
 
 /**
  * @author Florian Gutekunst
+ * @param toreHeim Genau dann null, wenn das Spiel noch nicht gespielt wurde
+ * @param toreAuswaerts Genau dann null, wenn das Spiel noch nicht gespielt wurde
+ * @param verlaengerung Genau dann null, wenn das Spiel noch nicht gespielt wurde
+ * @param elfmeterschiessen Genau dann null, wenn das Spiel noch nicht gespielt wurde
  */
 data class Spiel(
     val daheim: Verein,
     val auswaerts: Verein,
     val datum: LocalDate,
-    val toreHeim: Int,
-    val toreAuswaerts: Int,
-    val verlaengerung: Boolean,
-    val elfmeterschiessen: Boolean,
+    val toreHeim: Int?,
+    val toreAuswaerts: Int?,
+    val verlaengerung: Boolean?,
+    val elfmeterschiessen: Boolean?,
     val phase: Phase
 ) {
 

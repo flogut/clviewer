@@ -68,11 +68,10 @@ open class ParsingProvider : Provider {
 
             val ergebnisText = row.selectFirst("td:eq(5) > a")?.text() ?: continue
             val ergebnis = ergebnisText.substringBefore(" ").split(":")
-            val verlaengerung = ergebnisText.endsWith("n.V.")
-            val elfmeterschiessen = ergebnisText.endsWith("i.E.")
-
-            val toreHeim = ergebnis[0].toIntOrNull() ?: continue
-            val toreAuswaerts = ergebnis[1].toIntOrNull() ?: continue
+            val toreHeim = ergebnis[0].toIntOrNull()
+            val toreAuswaerts = ergebnis[1].toIntOrNull()
+            val verlaengerung= if (toreHeim != null && toreAuswaerts != null) ergebnisText.endsWith("n.V.") else null
+            val elfmeterschiessen = if (toreHeim != null && toreAuswaerts != null) ergebnisText.endsWith("i.E.") else null
 
             val phase = Phase.getValue(phaseString)
 
