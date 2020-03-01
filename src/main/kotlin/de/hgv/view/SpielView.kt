@@ -25,7 +25,7 @@ private const val FONT_SIZE = 15.0
  * @author Niklas Cölle, Moritz Brandt, Florian Gutekunst (Unterstützung)
  */
 class SpielView : Fragment() {
-    val spiel = params["spiel"] as? Spiel
+    private val spiel = params["spiel"] as? Spiel
     var stage: Stage? = null
 
     override val root = scrollpane {
@@ -50,7 +50,7 @@ class SpielView : Fragment() {
                     gridpane {
                         row {
                             // Wappen Heimmannschaft
-                            imageview(wappen[spiel.daheim]!!) {
+                            imageview(wappen.getValue(spiel.daheim)) {
                                 fitHeight = 100.0
                                 isPreserveRatio = true
                                 isSmooth = true
@@ -63,7 +63,7 @@ class SpielView : Fragment() {
                             }
 
                             // Ergebnis
-                            label("${spiel.toreHeim} : ${spiel.toreAuswaerts}") {
+                            label("${spiel.toreHeim ?: "?"} : ${spiel.toreAuswaerts ?: "?"}") {
                                 alignment = Pos.CENTER
                                 useMaxWidth = true
                                 font = Font.font(font.family, FontWeight.BOLD, 30.0)
@@ -74,7 +74,7 @@ class SpielView : Fragment() {
                             }
 
                             // Wappen Auswärtsmannschaft
-                            imageview(wappen[spiel.auswaerts]!!) {
+                            imageview(wappen.getValue(spiel.auswaerts)) {
                                 fitHeight = 100.0
                                 isPreserveRatio = true
                                 isSmooth = true
@@ -262,7 +262,8 @@ class SpielView : Fragment() {
 
     init {
         if (spiel != null) {
-            title = "${spiel.daheim.name} ${spiel.toreHeim} : ${spiel.toreAuswaerts} ${spiel.auswaerts.name}"
+            title =
+                "${spiel.daheim.name} ${spiel.toreHeim ?: "?"} : ${spiel.toreAuswaerts ?: "?"} ${spiel.auswaerts.name}"
         }
     }
 
