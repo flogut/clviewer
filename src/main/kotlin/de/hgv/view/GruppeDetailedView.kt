@@ -138,14 +138,14 @@ class GruppeDetailedView: Fragment() {
                                 label(spiel.daheim.name)
 
                                 // Tore Heimmannschaft
-                                label(spiel.toreHeim.toString()) {
+                                label(spiel.toreHeim.let { it?.toString() ?: "?" }) {
                                     paddingLeft = 10
                                 }
 
                                 label(" : ")
 
                                 // Tore Auswärtsmannschaft
-                                label(spiel.toreAuswaerts.toString()) {
+                                label(spiel.toreAuswaerts.let { it?.toString() ?: "?" }) {
                                     paddingRight = 10
                                 }
 

@@ -20,18 +20,25 @@ class TabelleProvider {
         val doc = Jsoup.parse(
             URL(
                 "http://www.weltfussball.de/spielplan/champions-league-${saison - 1}-$saison-" +
-                        "${gruppe.toLowerCase().replace(
-                    " ",
-                    "-"
-                )}/0/"
+                        "${
+                            gruppe.toLowerCase().replace(
+                                " ",
+                                "-"
+                            )
+                        }/0/"
             ), 5000
         )
 
         val zeilen = doc.select(".box > .data > .standard_tabelle:contains(Mannschaft) > tbody > tr:not(:has(th))")
         val tabelle = mutableListOf<Tabelle.Zeile>()
 
+        var letzterPlatz = 1
+
         for (zeile in zeilen) {
-            val platz = zeile.selectFirst("td")?.text()?.toIntOrNull() ?: continue
+            val platz = zeile.selectFirst("td")?.text()?.let {
+                if (it.isBlank()) letzterPlatz else it.toIntOrNull()
+            } ?: continue
+            letzterPlatz = platz
 
             val name = zeile.selectFirst("a")?.attr("title") ?: continue
             val id = zeile.selectFirst("a")?.attr("href")?.removeSurrounding("/teams/", "/") ?: continue
